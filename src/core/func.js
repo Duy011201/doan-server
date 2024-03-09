@@ -57,4 +57,17 @@ async function bcryptHashPassword(password) {
     return await bcrypt.hash(password, saltRounds);
 }
 
-module.exports = {isEmpty, isEmail, bcryptComparePassword, bcryptHashPassword, generateRandomVerifyCode, timeDiff}
+function filterFields(array, fieldsToKeep) {
+    // using filer fields for data get to database
+    return array.map(item => {
+        const filteredItem = {};
+        fieldsToKeep.forEach(field => {
+            if (item.hasOwnProperty(field)) {
+                filteredItem[field] = item[field];
+            }
+        });
+        return filteredItem;
+    });
+}
+
+module.exports = {isEmpty, isEmail, bcryptComparePassword, bcryptHashPassword, generateRandomVerifyCode, timeDiff, filterFields}

@@ -12,6 +12,9 @@ const authController = {
     },
     forgotPassword: (req, res) => {
         return authService.svForgotPassword(req, res)
+    },
+    refreshToken: (req, res) => {
+        return authService.svRefreshToken(req, res)
     }
 }
 
