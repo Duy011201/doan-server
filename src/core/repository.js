@@ -5,7 +5,7 @@ const setting = require('../config/setting');
 const querySQl = async (sql, fields) => {
     return await new Promise((resolve, reject) => {
         // console.log(querySQL, fields);
-        connectDB.query(sql, fields, (error, results, fields) => {
+        connectDB.query(sql, fields, (error, results) => {
             if (error) {
                 console.log('Error executing query:', error.stack);
                 reject(error);
@@ -31,35 +31,22 @@ const performSQL = async (option, tableDatabase, fields) => {
                    FROM ${tableDatabase} as anonymous`;
             break;
         case setting.SQL_METHOD.INSERT:
-            const columns = Object.keys(fields[0]).join(',');
-            const placeholders = fields.map(() => '?').join(',');
-            params = fields.map(field => Object.values(field)[0]);
-            sql = `INSERT INTO ${tableDatabase} (${columns})
-                   VALUES (${placeholders})`;
             break;
         case setting.SQL_METHOD.UPDATE:
             const obj = fields.pop();
+
+            // key id
             const objKey = Object.keys(obj)[0];
             const objValue = Object.values(obj)[0];
 
-            const updateParams = [];
-            const setConditions = [];
-
-            fields.forEach(field => {
-                const key = Object.keys(field)[0];
-                const value = field[key];
-                setConditions.push(`anonymous.${key} = ?`);
-                updateParams.push(value);
-            });
+            const setConditions = fields.map(field => `anonymous.${Object.keys(field)[0]} = ?`);
+            const updateParams = fields.map(field => Object.values(field)[0]);
 
             params = [...updateParams, objValue];
 
             sql = `UPDATE ${tableDatabase} as anonymous
                    SET ${setConditions.join(', ')}
                    WHERE anonymous.${objKey} = ?`;
-
-            console.log('lllllllllllllllllllllllll', sql);
-
             break;
     }
     if (option !== setting.SQL_METHOD.INSERT && option !== setting.SQL_METHOD.UPDATE && !isEmpty(fields)) {

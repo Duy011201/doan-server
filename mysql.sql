@@ -4,7 +4,7 @@ create table role
     _roleID    varchar(36)                         not null
         primary key,
     _userID    varchar(36)                         not null,
-    _name      varchar(255)                        not null,
+    _name      enum ('admin', 'employer', 'candidate') default 'head'                        not null,
     _desc      text                                not null,
     _createdAt timestamp default CURRENT_TIMESTAMP not null,
     _updatedAt timestamp default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
@@ -59,13 +59,11 @@ create table verify_code
         primary key,
     _code         varchar(36)                                           not null,
     _email        varchar(50)                                           not null unique,
-    _userID       varchar(36)                                           null,
     _status       enum ('active', 'inactive') default 'active'          not null,
     _createdAt    timestamp                   default CURRENT_TIMESTAMP not null,
     _updatedAt    timestamp                   default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
     _createdBy    varchar(36)                                           not null,
-    _updatedBy    varchar(36)                                           not null,
-    foreign key (_userID) references user (_userID)
+    _updatedBy    varchar(36)                                           not null
 );
 
 

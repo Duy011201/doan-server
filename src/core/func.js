@@ -14,7 +14,7 @@ function isEmpty(value) {
     }
 }
 
-function timeDiff (time1, time2, nDay) {
+function timeDiff(time1, time2, nDay) {
     const timeDiff = Math.abs(time1 - time2);
 
     // Đổi milliseconds thành số ngày
@@ -26,12 +26,11 @@ function timeDiff (time1, time2, nDay) {
 }
 
 function isEmail(email) {
-    // default length < 50 and length > 10
-    return !isEmpty(email) && email.length < 50 && email.length > 10 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    return !isEmpty(email) && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
 async function bcryptComparePassword(checkPassword, passwordInDB) {
-    // default length < 5 length > 20 and
+    // default length < 5 length > 20
     if (!isEmpty(checkPassword) && checkPassword.length < 5 && checkPassword.length > 20) return false;
 
     try {
@@ -70,4 +69,12 @@ function filterFields(array, fieldsToKeep) {
     });
 }
 
-module.exports = {isEmpty, isEmail, bcryptComparePassword, bcryptHashPassword, generateRandomVerifyCode, timeDiff, filterFields}
+module.exports = {
+    isEmpty,
+    isEmail,
+    bcryptComparePassword,
+    bcryptHashPassword,
+    generateRandomVerifyCode,
+    timeDiff,
+    filterFields
+}
