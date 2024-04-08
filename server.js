@@ -5,6 +5,7 @@ const connectDB = require("./src/config/database");
 const path = require("path");
 const logger = require("morgan");
 const {middlewareAuth} = require("./src/core/middleware");
+const logRequest = require("./src/common/log-request");
 const bodyParser = require("body-parser");
 
 require("dotenv").config();
@@ -17,6 +18,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(logger("dev"));
+app.use(logRequest);
 app.use(bodyParser.json());
 app.use(express.urlencoded({extended: true}));
 app.use(express.static(path.join(__dirname, "public")));

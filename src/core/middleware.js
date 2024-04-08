@@ -1,7 +1,5 @@
-const jwt = require('jsonwebtoken');
 const setting = require('../config/setting');
 const {verifyToken} = require('./jsonwebtoken');
-const createError = require('http-errors')
 
 require('dotenv').config();
 
@@ -21,7 +19,7 @@ function middlewareAuth(req, res, next) {
     }
 
     if (!token) {
-        return createError(setting.SYSTEM_STATUS_CODE.UNAUTHORIZED, setting.SYSTEM_STATUS_MESSAGE.UNAUTHORIZED);
+        return res.status(setting.SYSTEM_STATUS_CODE.UNAUTHORIZED).json({message:  setting.SYSTEM_STATUS_MESSAGE.UNAUTHORIZED});
     }
 
     try {
@@ -29,7 +27,7 @@ function middlewareAuth(req, res, next) {
         req.body.token = token;
         next();
     } catch (err) {
-        return createError(setting.SYSTEM_STATUS_CODE.BAD_REQUEST, setting.SYSTEM_STATUS_MESSAGE.INVALID_TOKEN);
+        res.status(setting.SYSTEM_STATUS_CODE.BAD_REQUEST).json({message:  setting.SYSTEM_STATUS_MESSAGE.INVALID_TOKEN});
     }
 }
 
