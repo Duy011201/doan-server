@@ -1,7 +1,7 @@
-const authService = require('../service/authService')
+const userService = require('../service/authService')
 
 const authController = {
-    login: (req, res) => {
+    create: (req, res) => {
         return authService.svLogin(req, res)
     },
     register: (req, res) => {
@@ -10,12 +10,6 @@ const authController = {
     verifyCode: (req, res) => {
         return authService.svVerifyCode(req, res)
     },
-    forgotPassword: (req, res) => {
-        return authService.svForgotPassword(req, res)
-    },
-    refreshToken: (req, res) => {
-        return authService.svRefreshToken(req, res)
-    }
 }
 
 module.exports = authController;

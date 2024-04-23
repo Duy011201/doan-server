@@ -1,15 +1,15 @@
 # TABLE
 create table role
 (
-    _roleID    varchar(36)                         not null
+    _roleID    varchar(36)                                                       not null
         primary key,
-    _userID    varchar(36)                         not null,
-    _name      enum ('admin', 'employer', 'candidate') default 'head'                        not null,
-    _desc      text                                not null,
-    _createdAt timestamp default CURRENT_TIMESTAMP not null,
-    _updatedAt timestamp default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
-    _createdBy varchar(36)                         not null,
-    _updatedBy varchar(36)                         not null
+    _userID    varchar(36)                                                       not null,
+    _name      enum ('admin', 'employer', 'candidate') default 'head'            not null,
+    _desc      text                                                              not null,
+    _createdAt timestamp                               default CURRENT_TIMESTAMP not null,
+    _updatedAt timestamp                               default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
+    _createdBy varchar(36)                                                       not null,
+    _updatedBy varchar(36)                                                       not null
 );
 
 create table company
@@ -52,6 +52,17 @@ create table user
     foreign key (_companyID) references company (_companyID)
 );
 
+# Support for user
+CREATE TABLE user_profile
+(
+    _profileID   varchar(36)  NOT NULL PRIMARY KEY,
+    _userID      varchar(36)  NOT NULL,
+    _language    varchar(50)  NULL,
+    _certificate varchar(100) NULL,
+    _education   varchar(255) NULL,
+    FOREIGN KEY (_userID) REFERENCES user (_userID)
+);
+
 # Store verify_code for user unique act update code
 create table verify_code
 (
@@ -66,6 +77,22 @@ create table verify_code
     _updatedBy    varchar(36)                                           not null
 );
 
+
+create table blog
+(
+    _blogID    varchar(36)                                           not null
+        primary key,
+    _status    enum ('active', 'inactive') default 'active'          not null,
+    _title     varchar(255)                                          not null,
+    _keyword   varchar(255)                                          not null,
+    _content   TEXT                                                  not null,
+    _createdAt timestamp                   default CURRENT_TIMESTAMP not null,
+    _updatedAt timestamp                   default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
+    _createdBy varchar(36)                                           not null,
+    _updatedBy varchar(36)                                           not null,
+    foreign key (_createdBy) references user (_userID),
+    foreign key (_updatedBy) references user (_userID)
+);
 
 # INSERT DATA
 INSERT INTO user (_userID, _companyID, _username, _email, _password, _phone, _avatar, _status, _createdAt, _updatedAt,

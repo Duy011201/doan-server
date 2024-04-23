@@ -27,6 +27,7 @@ app.use(middlewareAuth);
 connectDB.connect();
 
 app.use("/api/auth", routerAuth);
+app.use("/api/user", routerUser);
 
 app.listen(port, () => {
     console.log(`Server is listening on port ${port}`);
