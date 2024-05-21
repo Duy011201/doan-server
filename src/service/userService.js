@@ -1,191 +1,218 @@
 const setting = require('../config/setting');
-const {querySQl, performSQL} = require('../core/repository');
+const { querySQl, performSQL } = require('../core/repository');
 const {
-    isEmpty,
-    isEmail,
-    bcryptComparePassword,
-    bcryptHashPassword,
-    generateRandomVerifyCode,
-    timeDiff,
-    filterFields
+  isEmpty,
+  isEmail,
+  bcryptComparePassword,
+  bcryptHashPassword,
+  generateRandomVerifyCode,
+  timeDiff,
+  filterFields,
 } = require('../core/func');
-const {refreshToken, generateToken} = require('../core/jsonwebtoken');
-const {sendEmail} = require('../core/nodemailer');
-const {v4: uuidv4} = require('uuid');
+const { refreshToken, generateToken } = require('../core/jsonwebtoken');
+const { sendEmail } = require('../core/nodemailer');
+const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
 
 const authService = {
-    svCreate: async (req, res) => {
-        const email = req.body.email || undefined;
-        const password = req.body.password || undefined;
+  svCreate: async (req, res) => {
+    const { email, password, role, createdBy } = req.body;
+    const updatedBy = 'system';
+    const userID = uuidv4();
+    const roleID = uuidv4();
 
-        if (!isEmail(email)) {
-            return res.status(setting.SYSTEM_STATUS_CODE.BAD_REQUEST).json({message: setting.RESPONSE_MESSAGE.INVALID_EMAIL_FORMAT});
-        }
-        if (isEmpty(password)) {
-            return res.status(setting.SYSTEM_STATUS_CODE.BAD_REQUEST).json({message: setting.RESPONSE_MESSAGE.INVALID_PASSWORD_FORMAT});
-        }
+    // Validate request parameters
+    if (isEmpty(password) || !isEmail(email) || isEmpty(role)) {
+      return res
+        .status(setting.SYSTEM_STATUS_CODE.BAD_REQUEST)
+        .json({ message: setting.SYSTEM_STATUS_MESSAGE.BAD_REQUEST });
+    }
 
-        try {
-            let usersDB = await performSQL(setting.SQL_METHOD.GET, setting.TABLE_DATABASE.USER, [{_email: email}]);
-            switch (true) {
-                case (usersDB && usersDB.length > 1):
-                    return res.status(setting.SYSTEM_STATUS_CODE.INTERNAL_SERVER_ERROR).json({message: setting.RESPONSE_MESSAGE.ERROR_EXIT_ANY_ACCOUNT});
-                case (isEmpty(usersDB) || !await bcryptComparePassword(password, usersDB[0][`_password`])):
-                    return res.status(setting.SYSTEM_STATUS_CODE.BAD_REQUEST).json({message: setting.RESPONSE_MESSAGE.INCORRECT_EMAIL_OR_PASSWORD});
-                case (usersDB[0][`_status`] !== setting.SYSTEM_STATUS.ACTIVE):
-                    return res.status(setting.SYSTEM_STATUS_CODE.BAD_REQUEST).json({message: setting.RESPONSE_MESSAGE.ERROR_NOT_EXIT_OR_LOCK_ACCOUNT});
-            }
+    try {
+      let users = await performSQL(
+        setting.SQL_METHOD.GET,
+        setting.TABLE_DATABASE.USER,
+        [{ _email: email }]
+      );
 
-            let roles = await performSQL(setting.SQL_METHOD.GET, setting.TABLE_DATABASE.ROLE, [{_userID: usersDB[0][`_userID`]}]);
-            if (isEmpty(roles)) {
-                return res.status(setting.SYSTEM_STATUS_CODE.UNAUTHORIZED).json({message: setting.RESPONSE_MESSAGE.ERROR_ROLE});
-            }
+      if (!isEmpty(users)) {
+        return res
+          .status(setting.SYSTEM_STATUS_CODE.BAD_REQUEST)
+          .json({ message: setting.RESPONSE_MESSAGE.ERROR_EMAIL_ALREADY_EXIT });
+      }
 
-            usersDB = filterFields(usersDB, ['_userID', '_email', '_status']);
-            usersDB[0]['_roles'] = filterFields(roles, ['_name']);
-            usersDB[0]['_token'] = generateToken(usersDB[0]);
+      let hashPassword = await bcryptHashPassword(password);
 
-            return res.status(setting.SYSTEM_STATUS_CODE.OK).json({
-                message: setting.RESPONSE_MESSAGE.SUCCESS_LOGIN_ACCOUNT,
-                data: usersDB[0]
-            });
-        } catch (err) {
-            console.error('Error executing query login :', err.stack);
-            return res.status(setting.SYSTEM_STATUS_CODE.INTERNAL_SERVER_ERROR).json({message: setting.SYSTEM_STATUS_MESSAGE.INTERNAL_SERVER_ERROR});
-        }
-    },
-    svUpdate: async (req, res) => {
-        const {email, password, verifyCode, role, desc} = req.body;
-        const createdBy = 'system';
-        const updatedBy = 'system';
-        const userID = uuidv4();
-        const roleID = uuidv4();
-        const today = new Date();
+      await querySQl(
+        `INSERT INTO ${setting.TABLE_DATABASE.USER} (_userID, _email, _password, _status, _createdBy, _updatedBy)
+                                VALUES (?, ?, ?, ?, ?, ?)`,
+        [
+          userID,
+          email,
+          hashPassword,
+          setting.SYSTEM_STATUS.ACTIVE,
+          createdBy,
+          updatedBy,
+        ]
+      );
 
-        // Validate request parameters
-        if (isEmpty(verifyCode) || isEmpty(password) || !isEmail(email)) {
-            return res.status(setting.SYSTEM_STATUS_CODE.BAD_REQUEST).json({message: setting.SYSTEM_STATUS_MESSAGE.BAD_REQUEST});
-        }
+      await querySQl(
+        `INSERT INTO ${setting.TABLE_DATABASE.ROLE} (_roleID, _userID, _name, _createdBy, _updatedBy)
+                                VALUES (?, ?, ?, ?, ?)`,
+        [roleID, userID, role, createdBy, updatedBy]
+      );
 
-        try {
-            let users = await performSQL(setting.SQL_METHOD.GET, setting.TABLE_DATABASE.USER, [{_email: email}]);
+      return res.status(setting.SYSTEM_STATUS_CODE.OK).json({
+        message: setting.RESPONSE_MESSAGE.SUCCESS_CREATE,
+        data: { userID: userID },
+      });
+    } catch (err) {
+      console.error('Error executing query create user :', err.stack);
+      return res
+        .status(setting.SYSTEM_STATUS_CODE.INTERNAL_SERVER_ERROR)
+        .json({ message: setting.SYSTEM_STATUS_MESSAGE.INTERNAL_SERVER_ERROR });
+    }
+  },
+  svUpdate: async (req, res) => {
+    const payload = req.body;
 
-            if (!isEmpty(users)) {
-                return res.status(setting.SYSTEM_STATUS_CODE.BAD_REQUEST).json({message: setting.RESPONSE_MESSAGE.ERROR_EMAIL_ALREADY_EXIT});
-            }
+    //   _userID: this.dataDialog._userID,
+    //   _companyID: this.dataDialog._companyID,
+    //   _username: this.dataDialog._username,
+    //   _email: this.dataDialog._email,
+    //   _password: this.dataDialog._password,
+    //   _phone: this.dataDialog._phone,
+    //   _avatar: this.dataDialog._avatar,
+    //   _status: this.statusOption.key,
+    //   _createdAt: this.dataDialog._createdAt,
+    //   _updatedAt: new Date().toISOString(),
+    //   _createdBy: this.dataDialog._createdBy,
+    //   _updatedBy: getFromLocalStorage('userID'),
+    //   _role: this.dataDialog._role.key,
 
-            const verifyCodeDB = await performSQL(setting.SQL_METHOD.GET, setting.TABLE_DATABASE.VERIFY_CODE, [{_email: email}]);
+    // Validate request parameters
+    if (
+      isEmpty(payload.role) ||
+      isEmpty(payload.userID) ||
+      !isEmail(payload.email) ||
+      !isPhone(payload.status)
+    ) {
+      return res
+        .status(setting.SYSTEM_STATUS_CODE.BAD_REQUEST)
+        .json({ message: setting.SYSTEM_STATUS_MESSAGE.BAD_REQUEST });
+    }
 
-            // Default one day
-            if (isEmpty(verifyCodeDB) || verifyCodeDB[0]['_status'] !== setting.SYSTEM_STATUS.ACTIVE
-                || timeDiff(today, verifyCodeDB[0]['_updatedAt'], 1) && verifyCodeDB[0]['_code'] !== verifyCode) {
-                return res.status(setting.SYSTEM_STATUS_CODE.BAD_REQUEST).json({message: setting.RESPONSE_MESSAGE.INVALID_ENCRYPTION_AUTHENTICATION});
-            }
+    try {
+      let users = await performSQL(
+        setting.SQL_METHOD.GET,
+        setting.TABLE_DATABASE.USER,
+        [{ _userID: payload.userID }]
+      );
 
-            if (!isEmpty(role) && !isEmpty(desc)) {
-                let hashPassword = await bcryptHashPassword(password);
+      if (!isEmpty(users)) {
+        return res
+          .status(setting.SYSTEM_STATUS_CODE.BAD_REQUEST)
+          .json({ message: setting.RESPONSE_MESSAGE.ERROR_EMAIL_ALREADY_EXIT });
+      }
 
-                await querySQl(`INSERT INTO ${setting.TABLE_DATABASE.USER} (_userID, _email, _password, _status, _createdBy, _updatedBy)
-                                VALUES (?, ?, ?, ?, ?,
-                                        ?)`, [userID, email, hashPassword, setting.SYSTEM_STATUS.ACTIVE, createdBy, updatedBy]);
+      const verifyCodeDB = await performSQL(
+        setting.SQL_METHOD.GET,
+        setting.TABLE_DATABASE.VERIFY_CODE,
+        [{ _email: email }]
+      );
 
-                await querySQl(`INSERT INTO ${setting.TABLE_DATABASE.ROLE} (_roleID, _userID, _ name, _ desc, _createdBy, _updatedBy)
-                                VALUES (?, ?, ?, ?, ?, ?)`, [roleID, userID, role, desc, createdBy, updatedBy]);
+      // Default one day
+      if (
+        isEmpty(verifyCodeDB) ||
+        verifyCodeDB[0]['_status'] !== setting.SYSTEM_STATUS.ACTIVE ||
+        (timeDiff(today, verifyCodeDB[0]['_updatedAt'], 1) &&
+          verifyCodeDB[0]['_code'] !== verifyCode)
+      ) {
+        return res.status(setting.SYSTEM_STATUS_CODE.BAD_REQUEST).json({
+          message: setting.RESPONSE_MESSAGE.INVALID_ENCRYPTION_AUTHENTICATION,
+        });
+      }
 
-                await performSQL(setting.SQL_METHOD.UPDATE, setting.TABLE_DATABASE.VERIFY_CODE,
-                    [{_status: setting.SYSTEM_STATUS.IN_ACTIVE}, {_verifyCodeID: verifyCodeDB[0]['_verifyCodeID']}]);
+      if (!isEmpty(role) && !isEmpty(desc)) {
+        let hashPassword = await bcryptHashPassword(password);
 
-                return res.status(setting.SYSTEM_STATUS_CODE.OK).json({
-                    message: setting.RESPONSE_MESSAGE.SUCCESS_REGISTER_ACCOUNT,
-                    data: {userID: userID}
-                });
-            }
+        await querySQl(
+          `INSERT INTO ${setting.TABLE_DATABASE.USER} (_userID, _email, _password, _status, _createdBy, _updatedBy)
+                                VALUES (?, ?, ?, ?, ?, ?)`,
+          [
+            userID,
+            email,
+            hashPassword,
+            setting.SYSTEM_STATUS.ACTIVE,
+            createdBy,
+            updatedBy,
+          ]
+        );
 
-            return res.status(setting.SYSTEM_STATUS_CODE.INTERNAL_SERVER_ERROR).json({message: setting.RESPONSE_MESSAGE.ERROR_REGISTER_ACCOUNT});
-        } catch (err) {
-            console.error('Error executing query register :', err.stack);
-            return res.status(setting.SYSTEM_STATUS_CODE.INTERNAL_SERVER_ERROR).json({message: setting.SYSTEM_STATUS_MESSAGE.INTERNAL_SERVER_ERROR});
-        }
-    },
-    svDelete: async (req, res) => {
-        const verifyCode = generateRandomVerifyCode();
-        const verifyCodeID = uuidv4();
-        const email = req.body.email;
-        const createdBy = 'system';
-        const updatedBy = 'system';
-        const status = setting.SYSTEM_STATUS.ACTIVE;
+        await querySQl(
+          `INSERT INTO ${setting.TABLE_DATABASE.ROLE} (_roleID, _userID, _ name, _ desc, _createdBy, _updatedBy)
+                                VALUES (?, ?, ?, ?, ?, ?)`,
+          [roleID, userID, role, desc, createdBy, updatedBy]
+        );
 
-        // Validate email
-        if (!isEmail(email)) {
-            return res.status(setting.SYSTEM_STATUS_CODE.BAD_REQUEST).json({message: setting.SYSTEM_STATUS_MESSAGE.INVALID_EMAIL_FORMAT});
-        }
+        await performSQL(
+          setting.SQL_METHOD.UPDATE,
+          setting.TABLE_DATABASE.VERIFY_CODE,
+          [
+            { _status: setting.SYSTEM_STATUS.IN_ACTIVE },
+            { _verifyCodeID: verifyCodeDB[0]['_verifyCodeID'] },
+          ]
+        );
 
-        try {
-            const verifyCodeDB = await performSQL(setting.SQL_METHOD.GET, setting.TABLE_DATABASE.VERIFY_CODE, [{_email: email}]);
+        return res.status(setting.SYSTEM_STATUS_CODE.OK).json({
+          message: setting.RESPONSE_MESSAGE.SUCCESS_REGISTER_ACCOUNT,
+          data: { userID: userID },
+        });
+      }
 
-            if (isEmpty(verifyCodeDB)) {
-                await querySQl(`INSERT INTO ${setting.TABLE_DATABASE.VERIFY_CODE} (_verifyCodeID, _code, _email, _status, _createdBy, _updatedBy)
-                                VALUES (?, ?, ?, ?, ?,
-                                        ?)`, [verifyCodeID, verifyCode, email, status, createdBy, updatedBy]);
-            } else {
-                await performSQL(setting.SQL_METHOD.UPDATE, setting.TABLE_DATABASE.VERIFY_CODE, [{_code: verifyCode}, {_status: setting.SYSTEM_STATUS.ACTIVE},
-                    {_email: email}, {_createdBy: createdBy}, {_updatedBy: updatedBy}, {_verifyCodeID: verifyCodeDB[0]['_verifyCodeID']}]);
-            }
+      return res
+        .status(setting.SYSTEM_STATUS_CODE.INTERNAL_SERVER_ERROR)
+        .json({ message: setting.RESPONSE_MESSAGE.ERROR_REGISTER_ACCOUNT });
+    } catch (err) {
+      console.error('Error executing query register :', err.stack);
+      return res
+        .status(setting.SYSTEM_STATUS_CODE.INTERNAL_SERVER_ERROR)
+        .json({ message: setting.SYSTEM_STATUS_MESSAGE.INTERNAL_SERVER_ERROR });
+    }
+  },
+  svDelete: async (req, res) => {
+    const userID = req.body.userID;
+    try {
+      await performSQL(setting.SQL_METHOD.DELETE, setting.TABLE_DATABASE.USER, [
+        { _userID: userID },
+      ]);
+      await performSQL(setting.SQL_METHOD.DELETE, setting.TABLE_DATABASE.ROLE, [
+        { _userID: userID },
+      ]);
+      return res
+        .status(setting.SYSTEM_STATUS_CODE.OK)
+        .json({ message: setting.RESPONSE_MESSAGE.SUCCESS_DELETE });
+    } catch (err) {
+      console.error('Error executing query delete user by id :', err.stack);
+      return res
+        .status(setting.SYSTEM_STATUS_CODE.INTERNAL_SERVER_ERROR)
+        .json({ message: setting.SYSTEM_STATUS_MESSAGE.INTERNAL_SERVER_ERROR });
+    }
+  },
 
-            await sendEmail(process.env.SERVER_EMAIL_ADDRESS_TEST, process.env.SERVER_NAME, `Mã xác thực của bạn là: ${verifyCode}`);
-            return res.status(setting.SYSTEM_STATUS_CODE.OK).json({message: setting.RESPONSE_MESSAGE.SUCCESS_SEND_VERIFY_CODE});
-        } catch (err) {
-            console.error('Error executing query verify code :', err.stack);
-            return res.status(setting.SYSTEM_STATUS_CODE.INTERNAL_SERVER_ERROR).json({message: setting.SYSTEM_STATUS_MESSAGE.INTERNAL_SERVER_ERROR});
-        }
-    },
-
-    svGetAll: async (req, res) => {
-        const email = req.body.email;
-        const password = req.body.password;
-        const verifyCode = req.body.verifyCode;
-        const today = new Date();
-
-        // Validate email and verifyCode
-        if (isEmpty(verifyCode) || isEmpty(password)) {
-            return res.status(setting.SYSTEM_STATUS_CODE.BAD_REQUEST).json({message: setting.SYSTEM_STATUS_MESSAGE.BAD_REQUEST});
-        }
-        if (!isEmail(email)) {
-            return res.status(setting.SYSTEM_STATUS_CODE.BAD_REQUEST).json({message: setting.SYSTEM_STATUS_MESSAGE.INVALID_EMAIL_FORMAT});
-        }
-
-        try {
-            let userDB = await performSQL(setting.SQL_METHOD.GET, setting.TABLE_DATABASE.USER, [{_email: email}]);
-            if (isEmpty(userDB)) {
-                return res.status(setting.SYSTEM_STATUS_CODE.BAD_REQUEST).json({message: setting.RESPONSE_MESSAGE.ERROR_NOT_EXIT_OR_LOCK_ACCOUNT});
-            }
-            if (userDB[0]['_status'] !== setting.SYSTEM_STATUS.ACTIVE) {
-                return res.status(setting.SYSTEM_STATUS_CODE.BAD_REQUEST).json({message: setting.RESPONSE_MESSAGE.ERROR_NOT_EXIT_OR_LOCK_ACCOUNT});
-            }
-
-            const verifyCodeDB = await performSQL(setting.SQL_METHOD.GET, setting.TABLE_DATABASE.VERIFY_CODE, [{_email: email}]);
-
-            // Default one day
-            if (isEmpty(verifyCodeDB) || verifyCodeDB[0]['_status'] !== setting.SYSTEM_STATUS.ACTIVE
-                || timeDiff(today, verifyCodeDB[0]['_updatedAt'], 1) && verifyCodeDB[0]['_code'] !== verifyCode) {
-                return res.status(setting.SYSTEM_STATUS_CODE.BAD_REQUEST).json({message: setting.RESPONSE_MESSAGE.INVALID_ENCRYPTION_AUTHENTICATION});
-            }
-
-            let hashPassword = await bcryptHashPassword(password);
-            await performSQL(setting.SQL_METHOD.UPDATE, setting.TABLE_DATABASE.USER, [{_password: hashPassword},
-                {_updatedBy: userDB[0]['_userID']}, {_userID: userDB[0]['_userID']}]);
-
-            await performSQL(setting.SQL_METHOD.UPDATE, setting.TABLE_DATABASE.VERIFY_CODE,
-                [{_status: setting.SYSTEM_STATUS.IN_ACTIVE}, {_verifyCodeID: verifyCodeDB[0]['_verifyCodeID']}]);
-
-            return res.status(setting.SYSTEM_STATUS_CODE.OK).json({message: setting.RESPONSE_MESSAGE.SUCCESS_FORGOT_PASSWORD});
-
-        } catch (err) {
-            console.error('Error executing query forgot password :', err.stack);
-            return res.status(setting.SYSTEM_STATUS_CODE.INTERNAL_SERVER_ERROR).json({message: setting.SYSTEM_STATUS_MESSAGE.INTERNAL_SERVER_ERROR});
-        }
-    },
-}
+  svGetAll: async (req, res) => {
+    try {
+      let userDB =
+        await querySQl(`SELECT user.* , role._name as _role FROM ${setting.TABLE_DATABASE.USER} AS user  
+                LEFT JOIN ${setting.TABLE_DATABASE.ROLE} AS role ON user._userID = role._userID;`);
+      return res.status(setting.SYSTEM_STATUS_CODE.OK).json({ data: userDB });
+    } catch (err) {
+      console.error('Error executing query get all user :', err.stack);
+      return res
+        .status(setting.SYSTEM_STATUS_CODE.INTERNAL_SERVER_ERROR)
+        .json({ message: setting.SYSTEM_STATUS_MESSAGE.INTERNAL_SERVER_ERROR });
+    }
+  },
+};
 
 module.exports = authService;
