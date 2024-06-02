@@ -52,14 +52,25 @@ create table user
     foreign key (companyID) references company (companyID)
 );
 
+# Support for user
+CREATE TABLE user_profile
+(
+    profileID   varchar(36)  NOT NULL PRIMARY KEY,
+    userID      varchar(36)  NOT NULL,
+    language    varchar(50)  NULL,
+    certificate varchar(100) NULL,
+    education   varchar(255) NULL,
+    FOREIGN KEY (userID) REFERENCES user (userID)
+);
+
 # Store verify_code for user unique act update code
 create table verify_code
 (
     verifyCodeID varchar(36)                                           not null
         primary key,
+    userID       varchar(36)                                           null,
     code         varchar(36)                                           not null,
     email        varchar(50)                                           not null unique,
-    userID       varchar(36)                                           null,
     status       enum ('active', 'inactive') default 'active'          not null,
     createdAt    timestamp                   default CURRENT_TIMESTAMP not null,
     updatedAt    timestamp                   default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
@@ -68,11 +79,21 @@ create table verify_code
     foreign key (userID) references user (userID)
 );
 
+create table blog
+(
+    blogID    varchar(36)                                           not null
+        primary key,
+    status    enum ('active', 'inactive') default 'active'          not null,
+    title     varchar(255)                                          not null,
+    keyword   varchar(255)                                          not null,
+    content   TEXT                                                  not null,
+    createdAt timestamp                   default CURRENT_TIMESTAMP not null,
+    updatedAt timestamp                   default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
+    createdBy varchar(36)                                           not null,
+    updatedBy varchar(36)                                           not null,
+    foreign key (createdBy) references user (userID),
+    foreign key (updatedBy) references user (userID)
+);
 
 # INSERT DATA
-INSERT INTO user (userID, companyID, username, email, password, phone, avatar, status, createdAt, updatedAt,
-                  createdBy, updatedBy)
-VALUES ('0000-0000-0000-0000', '', 'Admin', 'admin@gmail.com', NOW(), NOW(), 'system', 'system');
 
-# INSERT INTO role (_roleID, _name, _desc, _status, _createdAt, _updatedAt, _createdBy, _updatedBy)
-# VALUES ('1', '', 'Admin', 'Administrator role', NOW(), NOW(), 'system', 'system');

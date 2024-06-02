@@ -52,7 +52,9 @@ const setting = {
 
         INCORRECT_EMAIL_OR_PASSWORD: 'Tài khoản hoặc mật khẩu không chính xác',
         INVALID_EMAIL_FORMAT: 'Định dạng email không hợp lệ',
+        INVALID_PASSWORD_FORMAT: 'Định dạng passwword không hợp lệ',
         INVALID_TOKEN: 'Định dạng token không hợp lệ',
+        INVALID_ENCRYPTION_AUTHENTICATION: 'Mã xác thực không hợp lệ',
 
         ERROR_REGISTER_ACCOUNT: 'Lỗi đăng ký tài khoản',
         ERROR_FORGOT_PASSWORD: 'Lỗi lấy lại mật khẩu',
@@ -61,7 +63,9 @@ const setting = {
         ERROR_EXPIRED_TOKEN: 'Lỗi mã xác thực hết hạn',
         ERROR_EMAIL_ALREADY_EXIT: 'Lỗi email đã tồn tại',
         ERROR_ENCODE: 'Lỗi mã hóa mật khẩu',
-    }
-}
+        ERROR_ROLE: 'Lỗi quyền',
+  },
+};
+
 
 module.exports = setting;
