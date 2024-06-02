@@ -5,7 +5,7 @@ create table role
         primary key,
     userID    varchar(36)                         not null,
     name      varchar(255)                        not null,
-    `desc`     text                               not null,
+    description     text                          not null,
     createdAt timestamp default CURRENT_TIMESTAMP not null,
     updatedAt timestamp default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
     createdBy varchar(36)                         not null,

@@ -74,6 +74,14 @@ function filterFields(array, fieldsToKeep) {
   });
 }
 
+function findIndexInObject(obj, value) {
+  return Object.values(obj).indexOf(value);
+}
+
+function findKeyInObject(obj, value) {
+  return Object.keys(obj).find(key => obj[key] === value);
+}
+
 module.exports = {
   isEmpty,
   isEmail,
@@ -82,4 +90,6 @@ module.exports = {
   generateRandomVerifyCode,
   timeDiff,
   filterFields,
+  findIndexInObject,
+  findKeyInObject
 };
