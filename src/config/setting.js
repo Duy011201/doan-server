@@ -29,7 +29,7 @@ const setting = {
     },
     SYSTEM_ROLE: {
         ADMIN: 'admin',
-        CANDIDATE: 'Candidate',
+        CANDIDATE: 'candidate',
         EMPLOYER: 'employer'
     },
     SYSTEM_STATUS: {
@@ -57,7 +57,6 @@ const setting = {
         ERROR_REGISTER_ACCOUNT: 'Lỗi đăng ký tài khoản',
         ERROR_FORGOT_PASSWORD: 'Lỗi lấy lại mật khẩu',
         ERROR_NOT_EXIT_OR_LOCK_ACCOUNT: 'Lỗi tài khoản không tồn tại hoặc đã bị khóa',
-        ERROR_EXIT_ANY_ACCOUNT: 'Lỗi tồn tại nhiều hơn 1 tài khoản',
         ERROR_EXPIRED_VERIFY_CODE: 'Lỗi mã xác thực hết hạn',
         ERROR_EXPIRED_TOKEN: 'Lỗi mã xác thực hết hạn',
         ERROR_EMAIL_ALREADY_EXIT: 'Lỗi email đã tồn tại',

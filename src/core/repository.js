@@ -57,9 +57,6 @@ const performSQL = async (option, tableDatabase, fields) => {
             sql = `UPDATE ${tableDatabase} as anonymous
                    SET ${setConditions.join(', ')}
                    WHERE anonymous.${objKey} = ?`;
-
-            console.log('lllllllllllllllllllllllll', sql);
-
             break;
     }
     if (option !== setting.SQL_METHOD.INSERT && option !== setting.SQL_METHOD.UPDATE && !isEmpty(fields)) {
