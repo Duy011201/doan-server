@@ -1,4 +1,4 @@
-const setting = require('../config/setting');
+const setting = require('../config/constant');
 const { querySQl, performSQL } = require('../core/repository');
 const {
   isEmpty,
@@ -9,8 +9,8 @@ const {
   timeDiff,
   filterFields,
 } = require('../core/func');
-const { refreshToken, generateToken } = require('../core/jsonwebtoken');
-const { sendEmail } = require('../core/nodemailer');
+const { refreshToken, generateToken } = require('../common/jsonwebtoken');
+const { sendEmail } = require('../common/nodemailer');
 const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
 

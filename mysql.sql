@@ -68,15 +68,13 @@ create table verify_code
 (
     verifyCodeID varchar(36)                                           not null
         primary key,
-    userID       varchar(36)                                           null,
     code         varchar(36)                                           not null,
     email        varchar(50)                                           not null unique,
     status       enum ('active', 'inactive') default 'active'          not null,
     createdAt    timestamp                   default CURRENT_TIMESTAMP not null,
     updatedAt    timestamp                   default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
     createdBy    varchar(36)                                           not null,
-    updatedBy    varchar(36)                                           not null,
-    foreign key (userID) references user (userID)
+    updatedBy    varchar(36)                                           not null
 );
 
 create table blog

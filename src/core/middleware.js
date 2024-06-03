@@ -1,5 +1,5 @@
-const setting = require('../config/setting');
-const { verifyToken } = require('./jsonwebtoken');
+const setting = require('../config/constant');
+const { verifyToken } = require('../common/jsonwebtoken');
 
 require('dotenv').config();
 

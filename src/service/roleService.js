@@ -1,4 +1,4 @@
-const setting = require('../config/setting');
+const setting = require('../config/constant');
 const { query } = require('../core/repository');
 const { isEmpty, isEmail, hashPassword } = require('../core/func');
 const { v4: uuidv4 } = require('uuid');

@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs');
-const setting = require('../config/setting');
+const setting = require('../config/constant');
 
 function isEmpty(value) {
   if (typeof value === 'string') {
