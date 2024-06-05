@@ -54,7 +54,7 @@ const constant = {
     SUCCESS_REGISTER_ACCOUNT: 'Đăng ký tài khoản thành công',
     SUCCESS_LOGIN_ACCOUNT: 'Đăng nhập tài khoản thành công',
     SUCCESS_SEND_VERIFY_CODE: 'Gửi mã xác thực thành công',
-    SUCCESS_FORGOT_PASSWORD: 'Lấy lại mật khẩu thành công',
+    SUCCESS_FORGOT_PASSWORD: 'Đổi mật khẩu thành công',
     SUCCESS_REFRESH_TOKEN: 'Lấy token mới thành công',
 
     INCORRECT_EMAIL_OR_PASSWORD: 'Tài khoản hoặc mật khẩu không chính xác',

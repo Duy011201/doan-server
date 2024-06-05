@@ -52,11 +52,6 @@ function generateRandomVerifyCode() {
 }
 
 async function bcryptHashPassword(password) {
-  // default length < 5 and length > 20
-  if (!isEmpty(password) && password.length < 5 && password.length > 20) {
-    throw new Error(setting.RESPONSE_MESSAGE.ERROR_ENCODE);
-  }
-
   const saltRounds = 10;
   return await bcrypt.hash(password, saltRounds);
 }
