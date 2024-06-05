@@ -24,7 +24,7 @@ const authService = {
             password: Joi.string().min(5).max(20).required()
         });
 
-        const { error } = schema.validate(payload);
+        const {error} = schema.validate(payload);
         if (error) {
             return res.status(constant.SYSTEM_STATUS_CODE.BadRequest)
                 .json({
@@ -79,16 +79,19 @@ const authService = {
         const updatedBy = 'system';
         const userID = uuidv4();
         const roleID = uuidv4();
+        const companyID = uuidv4();
         const today = new Date();
 
         const schema = Joi.object({
             email: Joi.string().email().required(),
             password: Joi.string().min(5).max(20).required(),
             role: Joi.string().required(),
-            verifyCode: Joi.string().max(6).required()
+            verifyCode: Joi.string().max(6).required(),
+            companyName: Joi.string(),
+            companyCorporateTaxCode: Joi.string()
         });
 
-        const { error } = schema.validate(payload);
+        const {error} = schema.validate(payload);
         if (error) {
             return res.status(constant.SYSTEM_STATUS_CODE.BadRequest)
                 .json({
@@ -112,36 +115,66 @@ const authService = {
                                                  FROM ${constant.TABLE_DATABASE.VERIFY_CODE} as v
                                                  WHERE v.email = ?`, [payload.email]);
 
-            // Default time createdAt one day
-            if (!isEmpty(verifyCodeDB) && timeDiff(today, verifyCodeDB[0]['createdAt'], 1)
-                && verifyCodeDB[0]['code'] === payload.verifyCode) {
-
-                const hashPassword = await bcryptHashPassword(payload.password);
-                const keyDescRole = findKeyInObject(constant.SYSTEM_ROLE, payload.role);
-
-                await querySQl(`INSERT INTO ${constant.TABLE_DATABASE.USER} (userID, email, password, status, createdBy, updatedBy)
-                                VALUES (?, ?, ?, ?, ?, ?)`, [userID, payload.email, hashPassword, constant.SYSTEM_STATUS.ACTIVE, createdBy, updatedBy])
-
-                await querySQl(`INSERT INTO ${constant.TABLE_DATABASE.ROLE} (roleID, userID, name, description, createdBy, updatedBy)
-                                VALUES (?, ?, ?, ?, ?, ?)`, [roleID, userID, payload.role, constant.SYSTEM_ROLE_DESC[keyDescRole], createdBy, updatedBy])
-
-                await querySQl(`UPDATE ${constant.TABLE_DATABASE.VERIFY_CODE}
-                                SET status = ?
-                                WHERE email = ?`
-                    , [constant.SYSTEM_STATUS.IN_ACTIVE, payload.email]);
-
-                return res.status(constant.SYSTEM_STATUS_CODE.OK)
+            if (isEmpty(verifyCodeDB) || !verifyCodeDB[0]['code'] === payload.verifyCode || !timeDiff(today, verifyCodeDB[0]['createdAt'], 1)) {
+                return res.status(constant.SYSTEM_STATUS_CODE.BadRequest)
                     .json({
-                        status: constant.SYSTEM_STATUS_CODE.OK,
-                        message: constant.RESPONSE_MESSAGE.SUCCESS_REGISTER_ACCOUNT,
-                        data: {userID: userID}
+                        status: constant.SYSTEM_STATUS_CODE.BadRequest,
+                        message: constant.RESPONSE_MESSAGE.ERROR_ENCRYPTION_VERIFY_CODE
                     });
             }
 
-            return res.status(constant.SYSTEM_STATUS_CODE.BadRequest)
+            const hashPassword = await bcryptHashPassword(payload.password);
+            const keyDescRole = findKeyInObject(constant.SYSTEM_ROLE, payload.role);
+
+            if (payload.role === constant.SYSTEM_ROLE.EMPLOYER) {
+                if (isEmpty(payload.companyName))
+                    return res.status(constant.SYSTEM_STATUS_CODE.BadRequest)
+                        .json({
+                            status: constant.SYSTEM_STATUS_CODE.BadRequest,
+                            massage: constant.RESPONSE_MESSAGE.INVALID_COMPANY_NAME
+                        });
+                if (isEmpty(payload.companyCorporateTaxCode))
+                    return res.status(constant.SYSTEM_STATUS_CODE.BadRequest)
+                        .json({
+                            status: constant.SYSTEM_STATUS_CODE.BadRequest,
+                            massage: constant.RESPONSE_MESSAGE.INVALID_COMPANY_CORPORATE_TAX_CODE
+                        });
+
+                let companyDB = await querySQl(`SELECT *
+                                         FROM ${constant.TABLE_DATABASE.COMPANY} as c
+                                         WHERE c.corporateTaxCode = ?`, [payload.corporateTaxCode]);
+
+                if (!isEmpty(companyDB))
+                    return res.status(constant.SYSTEM_STATUS_CODE.BadRequest)
+                        .json({
+                            status: constant.SYSTEM_STATUS_CODE.BadRequest,
+                            massage: constant.RESPONSE_MESSAGE.ERROR_COMPANY_CORPORATE_TAX_CODE_EXIT
+                        });
+
+                await querySQl(`INSERT INTO ${constant.TABLE_DATABASE.COMPANY} (companyID, name, corporateTaxCode, createdBy, updatedBy)
+                                VALUES (?, ?, ?, ?, ?)`, [companyID, payload.companyName, payload.companyCorporateTaxCode, createdBy, updatedBy])
+
+                await querySQl(`INSERT INTO ${constant.TABLE_DATABASE.USER} (userID, email, password, status, companyID, createdBy, updatedBy)
+                                VALUES (?, ?, ?, ?, ?, ?, ?)`, [userID, payload.email, hashPassword, constant.SYSTEM_STATUS.ACTIVE, companyID, createdBy, updatedBy])
+            }
+
+            if (payload.role === constant.SYSTEM_ROLE.CANDIDATE)
+                await querySQl(`INSERT INTO ${constant.TABLE_DATABASE.USER} (userID, email, password, status, createdBy, updatedBy)
+                                VALUES (?, ?, ?, ?, ?, ?)`, [userID, payload.email, hashPassword, constant.SYSTEM_STATUS.ACTIVE, createdBy, updatedBy])
+
+            await querySQl(`INSERT INTO ${constant.TABLE_DATABASE.ROLE} (roleID, userID, name, description, createdBy, updatedBy)
+                            VALUES (?, ?, ?, ?, ?, ?)`, [roleID, userID, payload.role, constant.SYSTEM_ROLE_DESC[keyDescRole], createdBy, updatedBy])
+
+            await querySQl(`UPDATE ${constant.TABLE_DATABASE.VERIFY_CODE}
+                            SET status = ?
+                            WHERE email = ?`
+                , [constant.SYSTEM_STATUS.IN_ACTIVE, payload.email]);
+
+            return res.status(constant.SYSTEM_STATUS_CODE.OK)
                 .json({
-                    status: constant.SYSTEM_STATUS_CODE.BadRequest,
-                    message: constant.RESPONSE_MESSAGE.ERROR_REGISTER_ACCOUNT
+                    status: constant.SYSTEM_STATUS_CODE.OK,
+                    message: constant.RESPONSE_MESSAGE.SUCCESS_REGISTER_ACCOUNT,
+                    data: {userID: userID}
                 });
         } catch (err) {
             console.error('Error executing query register :', err.stack);
@@ -164,7 +197,7 @@ const authService = {
             email: Joi.string().email().required(),
         });
 
-        const { error } = schema.validate(payload);
+        const {error} = schema.validate(payload);
         if (error) {
             return res.status(constant.SYSTEM_STATUS_CODE.BadRequest)
                 .json({
@@ -181,16 +214,16 @@ const authService = {
             if (isEmpty(verifyCodeDB)) {
                 await querySQl(`INSERT INTO ${constant.TABLE_DATABASE.VERIFY_CODE} (verifyCodeID, code, email, createdBy, updatedBy)
                                 VALUES (?, ?, ?, ?, ?)`, [verifyCodeID, verifyCode, payload.email, createdBy, updatedBy])
+            } else {
+                await querySQl(`UPDATE ${constant.TABLE_DATABASE.VERIFY_CODE}
+                                SET code      = ?,
+                                    email     = ?,
+                                    status    = ?,
+                                    createdBy = ?,
+                                    updatedBy = ?
+                                WHERE verifyCodeID = ?`,
+                    [verifyCode, payload.email, constant.SYSTEM_STATUS.ACTIVE, createdBy, updatedBy, verifyCodeDB[0]['verifyCodeID']]);
             }
-
-            await querySQl(`UPDATE ${constant.TABLE_DATABASE.VERIFY_CODE}
-                            SET code      = ?,
-                                email     = ?,
-                                status    = ?,
-                                createdBy = ?,
-                                updatedBy = ?
-                            WHERE verifyCodeID = ?`,
-                [verifyCode, payload.email, constant.SYSTEM_STATUS.ACTIVE, createdBy, updatedBy, verifyCodeDB[0]['verifyCodeID']]);
 
             await sendEmail(process.env.SERVER_EMAIL_ADDRESS_TEST, process.env.SERVER_NAME, `Mã xác thực của bạn là: ${verifyCode}`)
             return res.status(constant.SYSTEM_STATUS_CODE.OK)
@@ -218,7 +251,7 @@ const authService = {
             verifyCode: Joi.string().max(6).required()
         });
 
-        const { error } = schema.validate(payload);
+        const {error} = schema.validate(payload);
         if (error) {
             return res.status(constant.SYSTEM_STATUS_CODE.BadRequest)
                 .json({
@@ -248,26 +281,26 @@ const authService = {
                                                  FROM ${constant.TABLE_DATABASE.VERIFY_CODE} as v
                                                  WHERE v.email = ?`, [payload.email]);
 
-            // Default time updatedAt one day
-            if (!isEmpty(verifyCodeDB) && timeDiff(today, verifyCodeDB[0]['updatedAt'], 1)
-                && verifyCodeDB[0]['code'] === payload.verifyCode) {
-                const hashPassword = await bcryptHashPassword(payload.password);
-
-                await querySQl(`UPDATE ${constant.TABLE_DATABASE.USER}
-                                SET password = ?, updatedBy = ? WHERE email = ?`
-                    , [hashPassword, userDB[0]['userID'], payload.email]);
-
-                return res.status(constant.SYSTEM_STATUS_CODE.OK)
+            if (isEmpty(verifyCodeDB) || !verifyCodeDB[0]['code'] === payload.verifyCode || !timeDiff(today, verifyCodeDB[0]['createdAt'], 1)) {
+                return res.status(constant.SYSTEM_STATUS_CODE.BadRequest)
                     .json({
-                        status: constant.SYSTEM_STATUS_CODE.OK,
-                        message: constant.RESPONSE_MESSAGE.SUCCESS_FORGOT_PASSWORD
+                        status: constant.SYSTEM_STATUS_CODE.BadRequest,
+                        message: constant.RESPONSE_MESSAGE.ERROR_ENCRYPTION_VERIFY_CODE
                     });
             }
 
-            return res.status(constant.SYSTEM_STATUS_CODE.BadRequest)
+            const hashPassword = await bcryptHashPassword(payload.password);
+
+            await querySQl(`UPDATE ${constant.TABLE_DATABASE.USER}
+                            SET password  = ?,
+                                updatedBy = ?
+                            WHERE email = ?`
+                , [hashPassword, userDB[0]['userID'], payload.email]);
+
+            return res.status(constant.SYSTEM_STATUS_CODE.OK)
                 .json({
-                    status: constant.SYSTEM_STATUS_CODE.BadRequest,
-                    message: constant.RESPONSE_MESSAGE.ERROR_FORGOT_PASSWORD
+                    status: constant.SYSTEM_STATUS_CODE.OK,
+                    message: constant.RESPONSE_MESSAGE.SUCCESS_FORGOT_PASSWORD
                 });
         } catch (err) {
             console.error('Error executing query forgot password :', err.stack);
