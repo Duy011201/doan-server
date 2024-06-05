@@ -26,9 +26,9 @@ const authService = {
 
         const {error} = schema.validate(payload);
         if (error) {
-            return res.status(constant.SYSTEM_STATUS_CODE.BadRequest)
+            return res.status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
                 .json({
-                    status: constant.SYSTEM_STATUS_CODE.BadRequest,
+                    status: constant.SYSTEM_STATUS_CODE.BAD_REQUEST,
                     massage: error.details[0].message
                 });
         }
@@ -38,15 +38,15 @@ const authService = {
                                          FROM ${constant.TABLE_DATABASE.USER} as u
                                          WHERE u.email = ?`, [payload.email]);
             if (isEmpty(userDB) || !await bcryptComparePassword(payload.password, userDB[0][`password`]))
-                return res.status(constant.SYSTEM_STATUS_CODE.BadRequest)
+                return res.status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
                     .json({
-                        status: constant.SYSTEM_STATUS_CODE.BadRequest,
+                        status: constant.SYSTEM_STATUS_CODE.BAD_REQUEST,
                         message: constant.RESPONSE_MESSAGE.INCORRECT_EMAIL_OR_PASSWORD
                     });
             if (userDB[0][`status`] !== constant.SYSTEM_STATUS.ACTIVE)
-                return res.status(constant.SYSTEM_STATUS_CODE.BadRequest)
+                return res.status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
                     .json({
-                        status: constant.SYSTEM_STATUS_CODE.BadRequest,
+                        status: constant.SYSTEM_STATUS_CODE.BAD_REQUEST,
                         message: constant.RESPONSE_MESSAGE.ERROR_LOCK_ACCOUNT
                     });
 
@@ -66,17 +66,15 @@ const authService = {
                 });
         } catch (err) {
             console.error('Error executing query login :', err.stack);
-            return res.status(constant.SYSTEM_STATUS_CODE.InternalServerError)
+            return res.status(constant.SYSTEM_STATUS_CODE.INTERNAL_SERVER_ERROR)
                 .json({
-                    status: constant.SYSTEM_STATUS_CODE.InternalServerError,
-                    message: constant.SYSTEM_STATUS_MESSAGE.InternalServerError
+                    status: constant.SYSTEM_STATUS_CODE.INTERNAL_SERVER_ERROR,
+                    message: constant.SYSTEM_STATUS_MESSAGE.INTERNAL_SERVER_ERROR
                 });
         }
     },
     svRegister: async (req, res) => {
         const payload = req.body;
-        const createdBy = 'system';
-        const updatedBy = 'system';
         const userID = uuidv4();
         const roleID = uuidv4();
         const companyID = uuidv4();
@@ -93,9 +91,9 @@ const authService = {
 
         const {error} = schema.validate(payload);
         if (error) {
-            return res.status(constant.SYSTEM_STATUS_CODE.BadRequest)
+            return res.status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
                 .json({
-                    status: constant.SYSTEM_STATUS_CODE.BadRequest,
+                    status: constant.SYSTEM_STATUS_CODE.BAD_REQUEST,
                     massage: error.details[0].message
                 });
         }
@@ -105,9 +103,9 @@ const authService = {
                                          FROM ${constant.TABLE_DATABASE.USER} as u
                                          WHERE u.email = ?`, [payload.email]);
             if (!isEmpty(userDB))
-                return res.status(constant.SYSTEM_STATUS_CODE.BadRequest)
+                return res.status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
                     .json({
-                        status: constant.SYSTEM_STATUS_CODE.BadRequest,
+                        status: constant.SYSTEM_STATUS_CODE.BAD_REQUEST,
                         message: constant.RESPONSE_MESSAGE.ERROR_EMAIL_ALREADY_EXIT
                     });
 
@@ -116,9 +114,9 @@ const authService = {
                                                  WHERE v.email = ?`, [payload.email]);
 
             if (isEmpty(verifyCodeDB) || !verifyCodeDB[0]['code'] === payload.verifyCode || !timeDiff(today, verifyCodeDB[0]['createdAt'], 1)) {
-                return res.status(constant.SYSTEM_STATUS_CODE.BadRequest)
+                return res.status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
                     .json({
-                        status: constant.SYSTEM_STATUS_CODE.BadRequest,
+                        status: constant.SYSTEM_STATUS_CODE.BAD_REQUEST,
                         message: constant.RESPONSE_MESSAGE.ERROR_ENCRYPTION_VERIFY_CODE
                     });
             }
@@ -128,15 +126,15 @@ const authService = {
 
             if (payload.role === constant.SYSTEM_ROLE.EMPLOYER) {
                 if (isEmpty(payload.companyName))
-                    return res.status(constant.SYSTEM_STATUS_CODE.BadRequest)
+                    return res.status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
                         .json({
-                            status: constant.SYSTEM_STATUS_CODE.BadRequest,
+                            status: constant.SYSTEM_STATUS_CODE.BAD_REQUEST,
                             massage: constant.RESPONSE_MESSAGE.INVALID_COMPANY_NAME
                         });
                 if (isEmpty(payload.companyCorporateTaxCode))
-                    return res.status(constant.SYSTEM_STATUS_CODE.BadRequest)
+                    return res.status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
                         .json({
-                            status: constant.SYSTEM_STATUS_CODE.BadRequest,
+                            status: constant.SYSTEM_STATUS_CODE.BAD_REQUEST,
                             massage: constant.RESPONSE_MESSAGE.INVALID_COMPANY_CORPORATE_TAX_CODE
                         });
 
@@ -145,25 +143,25 @@ const authService = {
                                          WHERE c.corporateTaxCode = ?`, [payload.corporateTaxCode]);
 
                 if (!isEmpty(companyDB))
-                    return res.status(constant.SYSTEM_STATUS_CODE.BadRequest)
+                    return res.status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
                         .json({
-                            status: constant.SYSTEM_STATUS_CODE.BadRequest,
+                            status: constant.SYSTEM_STATUS_CODE.BAD_REQUEST,
                             massage: constant.RESPONSE_MESSAGE.ERROR_COMPANY_CORPORATE_TAX_CODE_EXIT
                         });
 
-                await querySQl(`INSERT INTO ${constant.TABLE_DATABASE.COMPANY} (companyID, name, corporateTaxCode, createdBy, updatedBy)
-                                VALUES (?, ?, ?, ?, ?)`, [companyID, payload.companyName, payload.companyCorporateTaxCode, createdBy, updatedBy])
+                await querySQl(`INSERT INTO ${constant.TABLE_DATABASE.COMPANY} (companyID, name, corporateTaxCode)
+                                VALUES (?, ?, ?)`, [companyID, payload.companyName, payload.companyCorporateTaxCode])
 
-                await querySQl(`INSERT INTO ${constant.TABLE_DATABASE.USER} (userID, email, password, status, companyID, createdBy, updatedBy)
-                                VALUES (?, ?, ?, ?, ?, ?, ?)`, [userID, payload.email, hashPassword, constant.SYSTEM_STATUS.ACTIVE, companyID, createdBy, updatedBy])
+                await querySQl(`INSERT INTO ${constant.TABLE_DATABASE.USER} (userID, email, password, status, companyID)
+                                VALUES (?, ?, ?, ?, ?)`, [userID, payload.email, hashPassword, constant.SYSTEM_STATUS.ACTIVE, companyID])
             }
 
             if (payload.role === constant.SYSTEM_ROLE.CANDIDATE)
-                await querySQl(`INSERT INTO ${constant.TABLE_DATABASE.USER} (userID, email, password, status, createdBy, updatedBy)
-                                VALUES (?, ?, ?, ?, ?, ?)`, [userID, payload.email, hashPassword, constant.SYSTEM_STATUS.ACTIVE, createdBy, updatedBy])
+                await querySQl(`INSERT INTO ${constant.TABLE_DATABASE.USER} (userID, email, password, status)
+                                VALUES (?, ?, ?, ?)`, [userID, payload.email, hashPassword, constant.SYSTEM_STATUS.ACTIVE])
 
-            await querySQl(`INSERT INTO ${constant.TABLE_DATABASE.ROLE} (roleID, userID, name, description, createdBy, updatedBy)
-                            VALUES (?, ?, ?, ?, ?, ?)`, [roleID, userID, payload.role, constant.SYSTEM_ROLE_DESC[keyDescRole], createdBy, updatedBy])
+            await querySQl(`INSERT INTO ${constant.TABLE_DATABASE.ROLE} (roleID, userID, name, description)
+                            VALUES (?, ?, ?, ?)`, [roleID, userID, payload.role, constant.SYSTEM_ROLE_DESC[keyDescRole]])
 
             await querySQl(`UPDATE ${constant.TABLE_DATABASE.VERIFY_CODE}
                             SET status = ?
@@ -178,10 +176,10 @@ const authService = {
                 });
         } catch (err) {
             console.error('Error executing query register :', err.stack);
-            return res.status(constant.SYSTEM_STATUS_CODE.InternalServerError)
+            return res.status(constant.SYSTEM_STATUS_CODE.INTERNAL_SERVER_ERROR)
                 .json({
-                    status: constant.SYSTEM_STATUS_CODE.InternalServerError,
-                    message: constant.SYSTEM_STATUS_MESSAGE.InternalServerError
+                    status: constant.SYSTEM_STATUS_CODE.INTERNAL_SERVER_ERROR,
+                    message: constant.SYSTEM_STATUS_MESSAGE.INTERNAL_SERVER_ERROR
                 });
         }
     },
@@ -190,8 +188,6 @@ const authService = {
         const verifyCode = generateRandomVerifyCode();
         const verifyCodeID = uuidv4();
         const payload = req.body;
-        const createdBy = 'system';
-        const updatedBy = 'system';
 
         const schema = Joi.object({
             email: Joi.string().email().required(),
@@ -199,9 +195,9 @@ const authService = {
 
         const {error} = schema.validate(payload);
         if (error) {
-            return res.status(constant.SYSTEM_STATUS_CODE.BadRequest)
+            return res.status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
                 .json({
-                    status: constant.SYSTEM_STATUS_CODE.BadRequest,
+                    status: constant.SYSTEM_STATUS_CODE.BAD_REQUEST,
                     massage: error.details[0].message
                 });
         }
@@ -212,17 +208,15 @@ const authService = {
                                                  WHERE v.email = ?`, [payload.email]);
 
             if (isEmpty(verifyCodeDB)) {
-                await querySQl(`INSERT INTO ${constant.TABLE_DATABASE.VERIFY_CODE} (verifyCodeID, code, email, createdBy, updatedBy)
-                                VALUES (?, ?, ?, ?, ?)`, [verifyCodeID, verifyCode, payload.email, createdBy, updatedBy])
+                await querySQl(`INSERT INTO ${constant.TABLE_DATABASE.VERIFY_CODE} (verifyCodeID, code, email)
+                                VALUES (?, ?, ?)`, [verifyCodeID, verifyCode, payload.email])
             } else {
                 await querySQl(`UPDATE ${constant.TABLE_DATABASE.VERIFY_CODE}
                                 SET code      = ?,
                                     email     = ?,
                                     status    = ?,
-                                    createdBy = ?,
-                                    updatedBy = ?
                                 WHERE verifyCodeID = ?`,
-                    [verifyCode, payload.email, constant.SYSTEM_STATUS.ACTIVE, createdBy, updatedBy, verifyCodeDB[0]['verifyCodeID']]);
+                    [verifyCode, payload.email, constant.SYSTEM_STATUS.ACTIVE, verifyCodeDB[0]['verifyCodeID']]);
             }
 
             await sendEmail(process.env.SERVER_EMAIL_ADDRESS_TEST, process.env.SERVER_NAME, `Mã xác thực của bạn là: ${verifyCode}`)
@@ -233,10 +227,10 @@ const authService = {
                 });
         } catch (err) {
             console.error('Error executing query verify code :', err.stack);
-            return res.status(constant.SYSTEM_STATUS_CODE.InternalServerError)
+            return res.status(constant.SYSTEM_STATUS_CODE.INTERNAL_SERVER_ERROR)
                 .json({
-                    status: constant.SYSTEM_STATUS_CODE.InternalServerError,
-                    message: constant.SYSTEM_STATUS_MESSAGE.InternalServerError
+                    status: constant.SYSTEM_STATUS_CODE.INTERNAL_SERVER_ERROR,
+                    message: constant.SYSTEM_STATUS_MESSAGE.INTERNAL_SERVER_ERROR
                 });
         }
     },
@@ -253,9 +247,9 @@ const authService = {
 
         const {error} = schema.validate(payload);
         if (error) {
-            return res.status(constant.SYSTEM_STATUS_CODE.BadRequest)
+            return res.status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
                 .json({
-                    status: constant.SYSTEM_STATUS_CODE.BadRequest,
+                    status: constant.SYSTEM_STATUS_CODE.BAD_REQUEST,
                     massage: error.details[0].message
                 });
         }
@@ -265,15 +259,15 @@ const authService = {
                                          FROM ${constant.TABLE_DATABASE.USER} as u
                                          WHERE u.email = ?`, [payload.email]);
             if (isEmpty(userDB))
-                return res.status(constant.SYSTEM_STATUS_CODE.BadRequest)
+                return res.status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
                     .json({
-                        status: constant.SYSTEM_STATUS_CODE.BadRequest,
+                        status: constant.SYSTEM_STATUS_CODE.BAD_REQUEST,
                         message: constant.RESPONSE_MESSAGE.ERROR_NOT_EXIT
                     });
             if (userDB[0][`status`] !== constant.SYSTEM_STATUS.ACTIVE)
-                return res.status(constant.SYSTEM_STATUS_CODE.BadRequest)
+                return res.status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
                     .json({
-                        status: constant.SYSTEM_STATUS_CODE.BadRequest,
+                        status: constant.SYSTEM_STATUS_CODE.BAD_REQUEST,
                         message: constant.RESPONSE_MESSAGE.ERROR_LOCK_ACCOUNT
                     });
 
@@ -282,9 +276,9 @@ const authService = {
                                                  WHERE v.email = ?`, [payload.email]);
 
             if (isEmpty(verifyCodeDB) || !verifyCodeDB[0]['code'] === payload.verifyCode || !timeDiff(today, verifyCodeDB[0]['createdAt'], 1)) {
-                return res.status(constant.SYSTEM_STATUS_CODE.BadRequest)
+                return res.status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
                     .json({
-                        status: constant.SYSTEM_STATUS_CODE.BadRequest,
+                        status: constant.SYSTEM_STATUS_CODE.BAD_REQUEST,
                         message: constant.RESPONSE_MESSAGE.ERROR_ENCRYPTION_VERIFY_CODE
                     });
             }
@@ -304,10 +298,10 @@ const authService = {
                 });
         } catch (err) {
             console.error('Error executing query forgot password :', err.stack);
-            return res.status(constant.SYSTEM_STATUS_CODE.InternalServerError)
+            return res.status(constant.SYSTEM_STATUS_CODE.INTERNAL_SERVER_ERROR)
                 .json({
-                    status: constant.SYSTEM_STATUS_CODE.InternalServerError,
-                    message: constant.SYSTEM_STATUS_MESSAGE.InternalServerError
+                    status: constant.SYSTEM_STATUS_CODE.INTERNAL_SERVER_ERROR,
+                    message: constant.SYSTEM_STATUS_MESSAGE.INTERNAL_SERVER_ERROR
                 });
         }
     },
