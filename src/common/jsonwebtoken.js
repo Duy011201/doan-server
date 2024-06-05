@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken');
-const setting = require('../config/constant');
-
+const constant = require('../config/constant');
 require('dotenv').config();
 const secretKey = process.env.SECRET_TOKEN_KEY;
 const expiresIn = process.env.EXPIRES_IN_TOKEN;
@@ -13,8 +12,8 @@ function verifyToken(token) {
   try {
     return jwt.verify(token, secretKey);
   } catch (error) {
-    console.log(error);
-    throw new Error(setting.RESPONSE_MESSAGE.INVALID_TOKEN);
+    console.error('Token không hợp lệ:', error.message);
+    throw new Error(constant.RESPONSE_MESSAGE.INVALID_TOKEN);
   }
 }
 
@@ -26,7 +25,7 @@ function refreshToken(token) {
     return generateToken(decoded);
   } catch (error) {
     console.log(error);
-    throw new Error(setting.RESPONSE_MESSAGE.INVALID_TOKEN);
+    throw new Error(constant.RESPONSE_MESSAGE.INVALID_TOKEN);
   }
 }
 

@@ -1,6 +1,7 @@
 const constant = require('../config/constant');
 const {querySQl} = require('../core/repository');
 const Joi = require('joi');
+const Loger = require('../common/logger')
 
 const {
     isEmpty,
@@ -50,14 +51,15 @@ const authService = {
                         message: constant.RESPONSE_MESSAGE.ERROR_LOCK_ACCOUNT
                     });
 
-            let roles = await querySQl(`SELECT *
-                                        FROM ${constant.TABLE_DATABASE.ROLE} as r
-                                        WHERE r.userID = ?`, [userDB[0]['userID']]);
+            let roles = await querySQl(`SELECT ur.userID, ur.roleID, r.name
+                                        FROM ${constant.TABLE_DATABASE.USER_ROLE} as ur
+                                        JOIN role r ON ur.roleID = r.roleID
+                                        WHERE ur.userID = ?`, [userDB[0]['userID']]);
             userDB = filterFields(userDB, ['userID', 'email', 'status']);
 
             // assign role, token
             userDB[0]['roles'] = isEmpty(roles) ? [] : filterFields(roles, ['name']);
-            [0]['token'] = generateToken(userDB[0]);
+            userDB[0]['token'] = generateToken(userDB[0]);
 
             return res.status(constant.SYSTEM_STATUS_CODE.OK)
                 .json({
@@ -76,7 +78,7 @@ const authService = {
     svRegister: async (req, res) => {
         const payload = req.body;
         const userID = uuidv4();
-        const roleID = uuidv4();
+        const userRoleID = uuidv4();
         const companyID = uuidv4();
         const today = new Date();
 
@@ -122,7 +124,7 @@ const authService = {
             }
 
             const hashPassword = await bcryptHashPassword(payload.password);
-            const keyDescRole = findKeyInObject(constant.SYSTEM_ROLE, payload.role);
+            // const keyDescRole = findKeyInObject(constant.SYSTEM_ROLE, payload.role);
 
             if (payload.role === constant.SYSTEM_ROLE.EMPLOYER) {
                 if (isEmpty(payload.companyName))
@@ -160,8 +162,19 @@ const authService = {
                 await querySQl(`INSERT INTO ${constant.TABLE_DATABASE.USER} (userID, email, password, status)
                                 VALUES (?, ?, ?, ?)`, [userID, payload.email, hashPassword, constant.SYSTEM_STATUS.ACTIVE])
 
-            await querySQl(`INSERT INTO ${constant.TABLE_DATABASE.ROLE} (roleID, userID, name, description)
-                            VALUES (?, ?, ?, ?)`, [roleID, userID, payload.role, constant.SYSTEM_ROLE_DESC[keyDescRole]])
+            let roleDB = await querySQl(`SELECT r.roleID
+                                         FROM ${constant.TABLE_DATABASE.ROLE} as r
+                                         WHERE r.name = ?`, [payload.role]);
+
+            if (isEmpty(roleDB))
+                return res.status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
+                    .json({
+                        status: constant.SYSTEM_STATUS_CODE.BAD_REQUEST,
+                        massage: constant.RESPONSE_MESSAGE.ERROR_ROLE
+                    });
+
+            await querySQl(`INSERT INTO ${constant.TABLE_DATABASE.USER_ROLE} (roleID, userID)
+                            VALUES (?, ?)`, [roleDB[0]['roleID'], userID])
 
             await querySQl(`UPDATE ${constant.TABLE_DATABASE.VERIFY_CODE}
                             SET status = ?

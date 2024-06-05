@@ -1,10 +1,9 @@
-const setting = require('../config/constant');
+const constant = require('../config/constant');
 const { verifyToken } = require('../common/jsonwebtoken');
 
 require('dotenv').config();
 
 function middlewareAuth(req, res, next) {
-  // auth
   if (req.url.includes('/auth')) {
     return next();
   }
@@ -20,8 +19,8 @@ function middlewareAuth(req, res, next) {
 
   if (!token) {
     return res
-      .status(setting.SYSTEM_STATUS_CODE.UNAUTHORIZED)
-      .json({ message: setting.SYSTEM_STATUS_MESSAGE.UNAUTHORIZED });
+      .status(constant.SYSTEM_STATUS_CODE.UNAUTHORIZED)
+      .json({ message: constant.SYSTEM_STATUS_MESSAGE.UNAUTHORIZED });
   }
 
   try {
@@ -30,8 +29,8 @@ function middlewareAuth(req, res, next) {
     next();
   } catch (err) {
     res
-      .status(setting.SYSTEM_STATUS_CODE.BAD_REQUEST)
-      .json({ message: setting.SYSTEM_STATUS_MESSAGE.INVALID_TOKEN });
+      .status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
+      .json({ message: constant.SYSTEM_STATUS_MESSAGE.INVALID_TOKEN });
   }
 }
 

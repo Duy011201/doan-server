@@ -3,8 +3,7 @@ create table role
 (
     roleID      varchar(36)                           not null
         primary key,
-    userID      varchar(36)                           not null,
-    name        varchar(255)                          not null,
+    name        varchar(255)                          not null unique,
     description text                                  not null,
     createdAt   timestamp   default CURRENT_TIMESTAMP not null,
     updatedAt   timestamp   default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
@@ -36,31 +35,36 @@ create table company
 
 create table user
 (
-    userID    varchar(36)                                       not null
+    userID      varchar(36)                                       not null
         primary key,
-    companyID varchar(36)                                       null,
-    username  varchar(255)                                      null,
-    email     varchar(50)                                       not null unique,
-    password  varchar(100)                                      not null,
-    phone     varchar(20)                                       null,
-    avatar    varchar(255)                                      null,
-    status    enum ('active', 'lock') default 'lock'            not null,
-    createdAt timestamp               default CURRENT_TIMESTAMP not null,
-    updatedAt timestamp               default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
-    createdBy varchar(36)             default 'system'          not null,
-    updatedBy varchar(36)             default 'system'          not null,
+    companyID   varchar(36)                                       null,
+    username    varchar(255)                                      null,
+    email       varchar(50)                                       not null unique,
+    password    varchar(100)                                      not null,
+    phone       varchar(20)                                       null,
+    avatar      varchar(255)                                      null,
+    status      enum ('active', 'lock') default 'lock'            not null,
+    language    varchar(50)                                       null,
+    certificate varchar(100)                                      null,
+    education   varchar(255)                                      null,
+    createdAt   timestamp               default CURRENT_TIMESTAMP not null,
+    updatedAt   timestamp               default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
+    createdBy   varchar(36)             default 'system'          not null,
+    updatedBy   varchar(36)             default 'system'          not null,
     foreign key (companyID) references company (companyID)
 );
 
-# Support for user
-CREATE TABLE user_profile
+create table user_role
 (
-    profileID   varchar(36)  NOT NULL PRIMARY KEY,
-    userID      varchar(36)  NOT NULL,
-    language    varchar(50)  NULL,
-    certificate varchar(100) NULL,
-    education   varchar(255) NULL,
-    FOREIGN KEY (userID) REFERENCES user (userID)
+    roleID    varchar(36)                           not null
+        primary key,
+    userID    varchar(36)                           not null,
+    createdAt timestamp   default CURRENT_TIMESTAMP not null,
+    updatedAt timestamp   default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
+    createdBy varchar(36) default 'system'          not null,
+    updatedBy varchar(36) default 'system'          not null,
+    foreign key (roleID) references role (roleID),
+    foreign key (userID) references user (userID)
 );
 
 # Store verify_code for user unique act update code
@@ -95,3 +99,13 @@ create table blog
 
 # INSERT DATA
 
+# Role
+INSERT INTO role (roleID, name, description, createdAt, updatedAt, createdBy, updatedBy)
+VALUES ('a9d3e7c8-2b3f-4c1e-9a6f-8dbe6d6f1c3a', 'supper_admin', 'Quản trị toàn bộ hệ thống', CURRENT_TIMESTAMP,
+        CURRENT_TIMESTAMP, 'system', 'system'),
+       ('b4f1d09e-34aa-4e38-b24f-9f1c3b7a6d8e', 'admin', 'Quản trị nhà tuyển dụng và ứng viên', CURRENT_TIMESTAMP,
+        CURRENT_TIMESTAMP, 'system', 'system'),
+       ('7d2e5a1f-46b1-4d9b-b7c3-5e9a7d4f8e2f', 'candidate', 'Ứng viên', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system',
+        'system'),
+       ('e8b3d2f7-8a6b-4e5f-9c1d-7f8e9a1d3c2b', 'employer', 'Nhà tuển dụng', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,
+        'system', 'system');
