@@ -27,9 +27,9 @@ const authService = {
 
         const {error} = schema.validate(payload);
         if (error) {
-            return res.status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
+            return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST)
                 .json({
-                    status: constant.SYSTEM_STATUS_CODE.BAD_REQUEST,
+                    status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
                     massage: error.details[0].message
                 });
         }
@@ -39,15 +39,15 @@ const authService = {
                                          FROM ${constant.TABLE_DATABASE.USER} as u
                                          WHERE u.email = ?`, [payload.email]);
             if (isEmpty(userDB) || !await bcryptComparePassword(payload.password, userDB[0][`password`]))
-                return res.status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
+                return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST)
                     .json({
-                        status: constant.SYSTEM_STATUS_CODE.BAD_REQUEST,
+                        status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
                         message: constant.RESPONSE_MESSAGE.INCORRECT_EMAIL_OR_PASSWORD
                     });
             if (userDB[0][`status`] !== constant.SYSTEM_STATUS.ACTIVE)
-                return res.status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
+                return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST)
                     .json({
-                        status: constant.SYSTEM_STATUS_CODE.BAD_REQUEST,
+                        status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
                         message: constant.RESPONSE_MESSAGE.ERROR_LOCK_ACCOUNT
                     });
 
@@ -61,17 +61,17 @@ const authService = {
             userDB[0]['roles'] = isEmpty(roles) ? [] : filterFields(roles, ['name']);
             userDB[0]['token'] = generateToken(userDB[0]);
 
-            return res.status(constant.SYSTEM_STATUS_CODE.OK)
+            return res.status(constant.SYSTEM_HTTP_STATUS.OK)
                 .json({
-                    status: constant.SYSTEM_STATUS_CODE.OK, message: constant.RESPONSE_MESSAGE.SUCCESS_LOGIN_ACCOUNT
+                    status: constant.SYSTEM_HTTP_STATUS.OK, message: constant.RESPONSE_MESSAGE.SUCCESS_LOGIN_ACCOUNT
                     , data: userDB[0]
                 });
         } catch (err) {
             console.error('Error executing query login :', err.stack);
-            return res.status(constant.SYSTEM_STATUS_CODE.INTERNAL_SERVER_ERROR)
+            return res.status(constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR)
                 .json({
-                    status: constant.SYSTEM_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                    message: constant.SYSTEM_STATUS_MESSAGE.INTERNAL_SERVER_ERROR
+                    status: constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                    message: constant.SYSTEM_HTTP_MESSAGE.INTERNAL_SERVER_ERROR
                 });
         }
     },
@@ -93,9 +93,9 @@ const authService = {
 
         const {error} = schema.validate(payload);
         if (error) {
-            return res.status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
+            return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST)
                 .json({
-                    status: constant.SYSTEM_STATUS_CODE.BAD_REQUEST,
+                    status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
                     massage: error.details[0].message
                 });
         }
@@ -105,9 +105,9 @@ const authService = {
                                          FROM ${constant.TABLE_DATABASE.USER} as u
                                          WHERE u.email = ?`, [payload.email]);
             if (!isEmpty(userDB))
-                return res.status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
+                return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST)
                     .json({
-                        status: constant.SYSTEM_STATUS_CODE.BAD_REQUEST,
+                        status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
                         message: constant.RESPONSE_MESSAGE.ERROR_EMAIL_ALREADY_EXIT
                     });
 
@@ -116,9 +116,9 @@ const authService = {
                                                  WHERE v.email = ?`, [payload.email]);
 
             if (isEmpty(verifyCodeDB) || !verifyCodeDB[0]['code'] === payload.verifyCode || !timeDiff(today, verifyCodeDB[0]['createdAt'], 1)) {
-                return res.status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
+                return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST)
                     .json({
-                        status: constant.SYSTEM_STATUS_CODE.BAD_REQUEST,
+                        status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
                         message: constant.RESPONSE_MESSAGE.ERROR_ENCRYPTION_VERIFY_CODE
                     });
             }
@@ -132,9 +132,9 @@ const authService = {
                                          WHERE c.corporateTaxCode = ?`, [payload.corporateTaxCode]);
 
                 if (!isEmpty(companyDB))
-                    return res.status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
+                    return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST)
                         .json({
-                            status: constant.SYSTEM_STATUS_CODE.BAD_REQUEST,
+                            status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
                             massage: constant.RESPONSE_MESSAGE.ERROR_COMPANY_CORPORATE_TAX_CODE_EXIT
                         });
 
@@ -154,9 +154,9 @@ const authService = {
                                          WHERE r.name = ?`, [payload.role]);
 
             if (isEmpty(roleDB))
-                return res.status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
+                return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST)
                     .json({
-                        status: constant.SYSTEM_STATUS_CODE.BAD_REQUEST,
+                        status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
                         massage: constant.RESPONSE_MESSAGE.ERROR_ROLE
                     });
 
@@ -168,18 +168,18 @@ const authService = {
                             WHERE email = ?`
                 , [constant.SYSTEM_STATUS.IN_ACTIVE, payload.email]);
 
-            return res.status(constant.SYSTEM_STATUS_CODE.OK)
+            return res.status(constant.SYSTEM_HTTP_STATUS.OK)
                 .json({
-                    status: constant.SYSTEM_STATUS_CODE.OK,
+                    status: constant.SYSTEM_HTTP_STATUS.OK,
                     message: constant.RESPONSE_MESSAGE.SUCCESS_REGISTER_ACCOUNT,
                     data: {userID: userID}
                 });
         } catch (err) {
             console.error('Error executing query register :', err.stack);
-            return res.status(constant.SYSTEM_STATUS_CODE.INTERNAL_SERVER_ERROR)
+            return res.status(constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR)
                 .json({
-                    status: constant.SYSTEM_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                    message: constant.SYSTEM_STATUS_MESSAGE.INTERNAL_SERVER_ERROR
+                    status: constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                    message: constant.SYSTEM_HTTP_MESSAGE.INTERNAL_SERVER_ERROR
                 });
         }
     },
@@ -195,9 +195,9 @@ const authService = {
 
         const {error} = schema.validate(payload);
         if (error) {
-            return res.status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
+            return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST)
                 .json({
-                    status: constant.SYSTEM_STATUS_CODE.BAD_REQUEST,
+                    status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
                     massage: error.details[0].message
                 });
         }
@@ -220,17 +220,17 @@ const authService = {
             }
 
             await sendEmail(process.env.SERVER_EMAIL_ADDRESS_TEST, process.env.SERVER_NAME, `Mã xác thực của bạn là: ${verifyCode}`)
-            return res.status(constant.SYSTEM_STATUS_CODE.OK)
+            return res.status(constant.SYSTEM_HTTP_STATUS.OK)
                 .json({
-                    status: constant.SYSTEM_STATUS_CODE.OK,
+                    status: constant.SYSTEM_HTTP_STATUS.OK,
                     message: constant.RESPONSE_MESSAGE.SUCCESS_SEND_VERIFY_CODE
                 });
         } catch (err) {
             console.error('Error executing query verify code :', err.stack);
-            return res.status(constant.SYSTEM_STATUS_CODE.INTERNAL_SERVER_ERROR)
+            return res.status(constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR)
                 .json({
-                    status: constant.SYSTEM_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                    message: constant.SYSTEM_STATUS_MESSAGE.INTERNAL_SERVER_ERROR
+                    status: constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                    message: constant.SYSTEM_HTTP_MESSAGE.INTERNAL_SERVER_ERROR
                 });
         }
     },
@@ -247,9 +247,9 @@ const authService = {
 
         const {error} = schema.validate(payload);
         if (error) {
-            return res.status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
+            return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST)
                 .json({
-                    status: constant.SYSTEM_STATUS_CODE.BAD_REQUEST,
+                    status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
                     massage: error.details[0].message
                 });
         }
@@ -259,15 +259,15 @@ const authService = {
                                          FROM ${constant.TABLE_DATABASE.USER} as u
                                          WHERE u.email = ?`, [payload.email]);
             if (isEmpty(userDB))
-                return res.status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
+                return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST)
                     .json({
-                        status: constant.SYSTEM_STATUS_CODE.BAD_REQUEST,
+                        status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
                         message: constant.RESPONSE_MESSAGE.ERROR_NOT_EXIT
                     });
             if (userDB[0][`status`] !== constant.SYSTEM_STATUS.ACTIVE)
-                return res.status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
+                return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST)
                     .json({
-                        status: constant.SYSTEM_STATUS_CODE.BAD_REQUEST,
+                        status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
                         message: constant.RESPONSE_MESSAGE.ERROR_LOCK_ACCOUNT
                     });
 
@@ -276,9 +276,9 @@ const authService = {
                                                  WHERE v.email = ?`, [payload.email]);
 
             if (isEmpty(verifyCodeDB) || !verifyCodeDB[0]['code'] === payload.verifyCode || !timeDiff(today, verifyCodeDB[0]['createdAt'], 1)) {
-                return res.status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
+                return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST)
                     .json({
-                        status: constant.SYSTEM_STATUS_CODE.BAD_REQUEST,
+                        status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
                         message: constant.RESPONSE_MESSAGE.ERROR_ENCRYPTION_VERIFY_CODE
                     });
             }
@@ -291,17 +291,17 @@ const authService = {
                             WHERE email = ?`
                 , [hashPassword, userDB[0]['userID'], payload.email]);
 
-            return res.status(constant.SYSTEM_STATUS_CODE.OK)
+            return res.status(constant.SYSTEM_HTTP_STATUS.OK)
                 .json({
-                    status: constant.SYSTEM_STATUS_CODE.OK,
+                    status: constant.SYSTEM_HTTP_STATUS.OK,
                     message: constant.RESPONSE_MESSAGE.SUCCESS_FORGOT_PASSWORD
                 });
         } catch (err) {
             console.error('Error executing query forgot password :', err.stack);
-            return res.status(constant.SYSTEM_STATUS_CODE.INTERNAL_SERVER_ERROR)
+            return res.status(constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR)
                 .json({
-                    status: constant.SYSTEM_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                    message: constant.SYSTEM_STATUS_MESSAGE.INTERNAL_SERVER_ERROR
+                    status: constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                    message: constant.SYSTEM_HTTP_MESSAGE.INTERNAL_SERVER_ERROR
                 });
         }
     },
@@ -317,15 +317,15 @@ const authService = {
         }
 
         try {
-            return res.status(constant.SYSTEM_STATUS_CODE.OK)
+            return res.status(constant.SYSTEM_HTTP_STATUS.OK)
                 .json({
-                    status: constant.SYSTEM_STATUS_CODE.OK,
-                    message: constant.SYSTEM_STATUS_MESSAGE.SUCCESS_REFRESH_TOKEN,
+                    status: constant.SYSTEM_HTTP_STATUS.OK,
+                    message: constant.SYSTEM_HTTP_MESSAGE.SUCCESS_REFRESH_TOKEN,
                     token: refreshToken(token),
                 });
         } catch (error) {
             return res
-                .status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
+                .status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST)
                 .json({message: constant.RESPONSE_MESSAGE.INVALID_TOKEN});
         }
     },

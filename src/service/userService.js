@@ -25,9 +25,9 @@ const authService = {
 
         const {error} = schema.validate(payload);
         if (error) {
-            return res.status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
+            return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST)
                 .json({
-                    status: constant.SYSTEM_STATUS_CODE.BAD_REQUEST,
+                    status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
                     massage: error.details[0].message
                 });
         }
@@ -48,7 +48,7 @@ const authService = {
                                          WHERE u.email = ?`, [payload.email]);
             if (!isEmpty(userDB)) {
                 return res
-                    .status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
+                    .status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST)
                     .json({message: constant.RESPONSE_MESSAGE.ERROR_EMAIL_ALREADY_EXIT});
             }
 
@@ -59,7 +59,7 @@ const authService = {
 
                 if (isEmpty(companyDB))
                     return res
-                        .status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
+                        .status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST)
                         .json({message: constant.RESPONSE_MESSAGE.ERROR_COMPANY_NOT_EXIT});
 
                 await querySQl(`INSERT INTO ${constant.TABLE_DATABASE.USER} (userID, email, password, status, companyID, createdBy)
@@ -76,17 +76,17 @@ const authService = {
             await querySQl(`INSERT INTO ${constant.TABLE_DATABASE.USER_ROLE} (roleID, userID, createdBy)
                             VALUES (?, ?, ?)`, [roleDB[0]['roleID'], userID, payload.createdBy])
 
-            return res.status(constant.SYSTEM_STATUS_CODE.OK)
+            return res.status(constant.SYSTEM_HTTP_STATUS.OK)
                 .json({
-                    status: constant.SYSTEM_STATUS_CODE.OK,
+                    status: constant.SYSTEM_HTTP_STATUS.OK,
                     message: constant.RESPONSE_MESSAGE.SUCCESS_CREATE,
                     data: {userID: userID}
                 });
         } catch (err) {
             console.error('Error executing query create user :', err.stack);
             return res
-                .status(constant.SYSTEM_STATUS_CODE.INTERNAL_SERVER_ERROR)
-                .json({message: constant.SYSTEM_STATUS_MESSAGE.INTERNAL_SERVER_ERROR});
+                .status(constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR)
+                .json({message: constant.SYSTEM_HTTP_MESSAGE.INTERNAL_SERVER_ERROR});
         }
     },
 
@@ -108,9 +108,9 @@ const authService = {
 
         const {error} = schema.validate(payload);
         if (error) {
-            return res.status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
+            return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST)
                 .json({
-                    status: constant.SYSTEM_STATUS_CODE.BAD_REQUEST,
+                    status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
                     massage: error.details[0].message
                 });
         }
@@ -122,9 +122,9 @@ const authService = {
 
             if (isEmpty(userDB)) {
                 return res
-                    .status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
+                    .status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST)
                     .json({
-                        status: constant.SYSTEM_STATUS_CODE.BAD_REQUEST,
+                        status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
                         message: constant.RESPONSE_MESSAGE.ERROR_USER_NOT_EXIT
                     });
             }
@@ -136,9 +136,9 @@ const authService = {
 
                 if (isEmpty(companyDB))
                     return res
-                        .status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
+                        .status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST)
                         .json({
-                            status: constant.SYSTEM_STATUS_CODE.BAD_REQUEST,
+                            status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
                             message: constant.RESPONSE_MESSAGE.ERROR_COMPANY_NOT_EXIT
                         });
 
@@ -171,18 +171,18 @@ const authService = {
                 , [payload.roleID, payload.updatedBy, payload.userID]);
 
             return res
-                .status(constant.SYSTEM_STATUS_CODE.INTERNAL_SERVER_ERROR)
+                .status(constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR)
                 .json({
-                    status: constant.SYSTEM_STATUS_CODE.OK,
+                    status: constant.SYSTEM_HTTP_STATUS.OK,
                     message: constant.RESPONSE_MESSAGE.ERROR_REGISTER_ACCOUNT
                 });
         } catch (err) {
             console.error('Error executing query register :', err.stack);
             return res
-                .status(constant.SYSTEM_STATUS_CODE.INTERNAL_SERVER_ERROR)
+                .status(constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR)
                 .json({
-                    status: constant.SYSTEM_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                    message: constant.SYSTEM_STATUS_MESSAGE.INTERNAL_SERVER_ERROR
+                    status: constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                    message: constant.SYSTEM_HTTP_MESSAGE.INTERNAL_SERVER_ERROR
                 });
         }
     },
@@ -195,9 +195,9 @@ const authService = {
 
         const {error} = schema.validate(payload);
         if (error) {
-            return res.status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
+            return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST)
                 .json({
-                    status: constant.SYSTEM_STATUS_CODE.BAD_REQUEST,
+                    status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
                     massage: error.details[0].message
                 });
         }
@@ -208,18 +208,18 @@ const authService = {
                             WHERE u.userID = ?`, [constant.SYSTEM_STATUS.IN_ACTIVE, payload.userID]);
 
             return res
-                .status(constant.SYSTEM_STATUS_CODE.OK)
+                .status(constant.SYSTEM_HTTP_STATUS.OK)
                 .json({
-                    status: constant.SYSTEM_STATUS_CODE.OK,
+                    status: constant.SYSTEM_HTTP_STATUS.OK,
                     message: constant.RESPONSE_MESSAGE.SUCCESS_DELETE
                 });
         } catch (err) {
             console.error('Error executing query delete user by id :', err.stack);
             return res
-                .status(constant.SYSTEM_STATUS_CODE.INTERNAL_SERVER_ERROR)
+                .status(constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR)
                 .json({
-                    status: constant.SYSTEM_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                    message: constant.SYSTEM_STATUS_MESSAGE.INTERNAL_SERVER_ERROR
+                    status: constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                    message: constant.SYSTEM_HTTP_MESSAGE.INTERNAL_SERVER_ERROR
                 });
         }
     },
@@ -237,17 +237,17 @@ const authService = {
                                                    ON ur.roleID = r.roleID
                                 WHERE u.status = '${constant.SYSTEM_STATUS.ACTIVE}'
                                    or u.status = '${constant.SYSTEM_STATUS.LOCK}'`);
-            return res.status(constant.SYSTEM_STATUS_CODE.OK).json({
-                status: constant.SYSTEM_STATUS_CODE.OK,
+            return res.status(constant.SYSTEM_HTTP_STATUS.OK).json({
+                status: constant.SYSTEM_HTTP_STATUS.OK,
                 data: userDB
             });
         } catch (err) {
             console.error('Error executing query get all user :', err.stack);
             return res
-                .status(constant.SYSTEM_STATUS_CODE.INTERNAL_SERVER_ERROR)
+                .status(constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR)
                 .json({
-                    status: constant.SYSTEM_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                    message: constant.SYSTEM_STATUS_MESSAGE.INTERNAL_SERVER_ERROR
+                    status: constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                    message: constant.SYSTEM_HTTP_MESSAGE.INTERNAL_SERVER_ERROR
                 });
         }
     },
@@ -261,9 +261,9 @@ const authService = {
 
         const {error} = schema.validate(payload);
         if (error) {
-            return res.status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
+            return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST)
                 .json({
-                    status: constant.SYSTEM_STATUS_CODE.BAD_REQUEST,
+                    status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
                     massage: error.details[0].message
                 });
         }
@@ -277,18 +277,18 @@ const authService = {
                             WHERE u.userID = ?`, [hashPassword, payload.userID]);
 
             return res
-                .status(constant.SYSTEM_STATUS_CODE.OK)
+                .status(constant.SYSTEM_HTTP_STATUS.OK)
                 .json({
-                    status: constant.SYSTEM_STATUS_CODE.OK,
+                    status: constant.SYSTEM_HTTP_STATUS.OK,
                     message: constant.RESPONSE_MESSAGE.SUCCESS_RESET_PASSWORD
                 });
         } catch (err) {
             console.error('Error executing query reset password user by id :', err.stack);
             return res
-                .status(constant.SYSTEM_STATUS_CODE.INTERNAL_SERVER_ERROR)
+                .status(constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR)
                 .json({
-                    status: constant.SYSTEM_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                    message: constant.SYSTEM_STATUS_MESSAGE.INTERNAL_SERVER_ERROR
+                    status: constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                    message: constant.SYSTEM_HTTP_MESSAGE.INTERNAL_SERVER_ERROR
                 });
         }
     }

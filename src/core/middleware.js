@@ -19,8 +19,8 @@ function middlewareAuth(req, res, next) {
 
   if (!token) {
     return res
-      .status(constant.SYSTEM_STATUS_CODE.UNAUTHORIZED)
-      .json({ message: constant.SYSTEM_STATUS_MESSAGE.UNAUTHORIZED });
+      .status(constant.SYSTEM_HTTP_STATUS.UNAUTHORIZED)
+      .json({ message: constant.SYSTEM_HTTP_MESSAGE.UNAUTHORIZED });
   }
 
   try {
@@ -36,16 +36,16 @@ function middlewareAuth(req, res, next) {
     //   next();
     // } else {
     //   return res
-    //       .status(constant.SYSTEM_STATUS_CODE.UNAUTHORIZED)
-    //       .json({ message: constant.SYSTEM_STATUS_MESSAGE.UNAUTHORIZED });
+    //       .status(constant.SYSTEM_HTTP_STATUS.UNAUTHORIZED)
+    //       .json({ message: constant.SYSTEM_HTTP_MESSAGE.UNAUTHORIZED });
     // }
 
     req.body.token = token;
     next();
   } catch (err) {
     res
-      .status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
-      .json({ message: constant.SYSTEM_STATUS_MESSAGE.INVALID_TOKEN });
+      .status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST)
+      .json({ message: constant.SYSTEM_HTTP_MESSAGE.INVALID_TOKEN });
   }
 }
 

@@ -12,8 +12,8 @@ const authService = {
   //   if (isEmpty(email) || isEmpty(password)) {
   //     return res.json(
   //       new HttpException(
-  //         setting.SYSTEM_STATUS_CODE.BadRequest,
-  //         setting.SYSTEM_STATUS_MESSAGE.BadRequest,
+  //         setting.SYSTEM_HTTP_STATUS.BadRequest,
+  //         setting.SYSTEM_HTTP_MESSAGE.BadRequest,
   //         []
   //       )
   //     );
@@ -21,7 +21,7 @@ const authService = {
   //   if (isEmail(email)) {
   //     return res.json(
   //       new HttpException(
-  //         setting.SYSTEM_STATUS_CODE.BadRequest,
+  //         setting.SYSTEM_HTTP_STATUS.BadRequest,
   //         setting.RESPONSE_MESSAGE.INVALID_EMAIL_FORMAT,
   //         []
   //       )
@@ -36,12 +36,12 @@ const authService = {
   //       [email, password]
   //     ).then((results) => {
   //       // if (isPassword(password, )) {
-  //       //     return res.json(new HttpException(setting.SYSTEM_STATUS_CODE.BadRequest, setting.ERROR_MESSAGE.INVALID_EMAIL_FORMAT, []));
+  //       //     return res.json(new HttpException(setting.SYSTEM_HTTP_STATUS.BadRequest, setting.ERROR_MESSAGE.INVALID_EMAIL_FORMAT, []));
   //       // }
   //
   //       return res.json(
   //         new HttpException(
-  //           setting.SYSTEM_STATUS_CODE.OK,
+  //           setting.SYSTEM_HTTP_STATUS.OK,
   //           setting.RESPONSE_MESSAGE.REGISTER_ACCOUNT_SUCCESS,
   //           {}
   //         )
@@ -51,8 +51,8 @@ const authService = {
   //     console.error('Error executing query login :', err);
   //     return res.json(
   //       new HttpException(
-  //         setting.SYSTEM_STATUS_CODE.BadRequest,
-  //         setting.SYSTEM_STATUS_MESSAGE.BadRequest,
+  //         setting.SYSTEM_HTTP_STATUS.BadRequest,
+  //         setting.SYSTEM_HTTP_MESSAGE.BadRequest,
   //         {}
   //       )
   //     );

@@ -6,7 +6,7 @@ const constant = {
     COMPANY: 'company',
     VERIFY_CODE: 'verify_code',
   },
-  SYSTEM_STATUS_CODE: {
+  SYSTEM_HTTP_STATUS: {
     OK: 200,
     CREATED: 201,
     NO_CONTENT: 204,
@@ -17,7 +17,7 @@ const constant = {
     INTERNAL_SERVER_ERROR: 500,
     SERVICE_UNAVAILABLE: 503
   },
-  SYSTEM_STATUS_MESSAGE: {
+  SYSTEM_HTTP_MESSAGE: {
     OK: 'OK',
     CREATED: 'Created',
     NO_CONTENT: 'No Content',
