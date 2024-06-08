@@ -1,1 +1,2 @@
-- thêm thư viện joi
+- kiểm tra quyền user admin khi thực hiện chức năng cho user
+- select join nhiều bảng cùng lúc để khỏi kiểm tra nhiều lần

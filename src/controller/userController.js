@@ -13,6 +13,9 @@ const userController = {
   delete: (req, res) => {
     return userService.svDelete(req, res);
   },
+  resetPassword: (req, res) => {
+    return userService.svResetPassword(req, res);
+  },
 };
 
 module.exports = userController;

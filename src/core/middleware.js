@@ -25,6 +25,21 @@ function middlewareAuth(req, res, next) {
 
   try {
     req.user = verifyToken(token);
+
+    // const isAdmin = Array.isArray(req.user.roles) && req.user.roles.some(role => {
+    //   return role.name === constant.SYSTEM_ROLE.ADMIN ||
+    //       role.name === constant.SYSTEM_ROLE.SUPER_ADMIN;
+    // })
+
+    // if (req.url.includes('/admin') && isAdmin) {
+    //   req.body.token = token;
+    //   next();
+    // } else {
+    //   return res
+    //       .status(constant.SYSTEM_STATUS_CODE.UNAUTHORIZED)
+    //       .json({ message: constant.SYSTEM_STATUS_MESSAGE.UNAUTHORIZED });
+    // }
+
     req.body.token = token;
     next();
   } catch (err) {

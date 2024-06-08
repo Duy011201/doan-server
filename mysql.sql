@@ -43,7 +43,7 @@ create table user
     password    varchar(100)                                      not null,
     phone       varchar(20)                                       null,
     avatar      varchar(255)                                      null,
-    status      enum ('active', 'lock') default 'lock'            not null,
+    status      enum ('active', 'inactive', 'lock') default 'lock'            not null,
     language    varchar(50)                                       null,
     certificate varchar(100)                                      null,
     education   varchar(255)                                      null,
@@ -56,8 +56,7 @@ create table user
 
 create table user_role
 (
-    roleID    varchar(36)                           not null
-        primary key,
+    roleID    varchar(36)                           not null,
     userID    varchar(36)                           not null,
     createdAt timestamp   default CURRENT_TIMESTAMP not null,
     updatedAt timestamp   default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
@@ -101,7 +100,7 @@ create table blog
 
 # Role
 INSERT INTO role (roleID, name, description, createdAt, updatedAt, createdBy, updatedBy)
-VALUES ('a9d3e7c8-2b3f-4c1e-9a6f-8dbe6d6f1c3a', 'supper_admin', 'Quản trị toàn bộ hệ thống', CURRENT_TIMESTAMP,
+VALUES ('a9d3e7c8-2b3f-4c1e-9a6f-8dbe6d6f1c3a', 'super_admin', 'Quản trị toàn bộ hệ thống', CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP, 'system', 'system'),
        ('b4f1d09e-34aa-4e38-b24f-9f1c3b7a6d8e', 'admin', 'Quản trị nhà tuyển dụng và ứng viên', CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP, 'system', 'system'),

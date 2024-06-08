@@ -18,7 +18,7 @@ module.exports = [
       // Add your custom ESLint rules here
     },
     settings: {
-      // Add your custom settings here if needed
+      // Add your custom configs here if needed
     },
   },
   {

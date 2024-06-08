@@ -29,7 +29,7 @@ const constant = {
     SERVICE_UNAVAILABLE: 'Service Unavailable',
   },
   SYSTEM_ROLE: {
-    SUPPER_ADMIN: 'super_admin',
+    SUPER_ADMIN: 'super_admin',
     ADMIN: 'admin',
     CANDIDATE: 'candidate',
     EMPLOYER: 'employer',
@@ -57,7 +57,9 @@ const constant = {
     SUCCESS_SEND_VERIFY_CODE: 'Gửi mã xác thực thành công',
     SUCCESS_FORGOT_PASSWORD: 'Đổi mật khẩu thành công',
     SUCCESS_REFRESH_TOKEN: 'Lấy token mới thành công',
-    SUCCESS_CREATE_USER: 'Tạo người dùng thành công',
+    SUCCESS_CREATE: 'Tạo thành công',
+    SUCCESS_DELETE: 'Xóa thành công',
+    SUCCESS_RESET_PASSWORD: 'Đặt lại mật khẩu thành công',
 
     INCORRECT_EMAIL_OR_PASSWORD: 'Tài khoản hoặc mật khẩu không chính xác',
     INVALID_EMAIL_FORMAT: 'Định dạng email không hợp lệ',
