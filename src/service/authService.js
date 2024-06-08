@@ -127,19 +127,6 @@ const authService = {
             // const keyDescRole = findKeyInObject(constant.SYSTEM_ROLE, payload.role);
 
             if (payload.role === constant.SYSTEM_ROLE.EMPLOYER) {
-                if (isEmpty(payload.companyName))
-                    return res.status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
-                        .json({
-                            status: constant.SYSTEM_STATUS_CODE.BAD_REQUEST,
-                            massage: constant.RESPONSE_MESSAGE.INVALID_COMPANY_NAME
-                        });
-                if (isEmpty(payload.companyCorporateTaxCode))
-                    return res.status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
-                        .json({
-                            status: constant.SYSTEM_STATUS_CODE.BAD_REQUEST,
-                            massage: constant.RESPONSE_MESSAGE.INVALID_COMPANY_CORPORATE_TAX_CODE
-                        });
-
                 let companyDB = await querySQl(`SELECT *
                                          FROM ${constant.TABLE_DATABASE.COMPANY} as c
                                          WHERE c.corporateTaxCode = ?`, [payload.corporateTaxCode]);
@@ -330,10 +317,12 @@ const authService = {
         }
 
         try {
-            return res.status(constant.SYSTEM_STATUS_CODE.OK).json({
-                message: constant.SYSTEM_STATUS_MESSAGE.SUCCESS_REFRESH_TOKEN,
-                token: refreshToken(token),
-            });
+            return res.status(constant.SYSTEM_STATUS_CODE.OK)
+                .json({
+                    status: constant.SYSTEM_STATUS_CODE.OK,
+                    message: constant.SYSTEM_STATUS_MESSAGE.SUCCESS_REFRESH_TOKEN,
+                    token: refreshToken(token),
+                });
         } catch (error) {
             return res
                 .status(constant.SYSTEM_STATUS_CODE.BAD_REQUEST)
