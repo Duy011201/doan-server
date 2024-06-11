@@ -16,6 +16,9 @@ const userController = {
   resetPassword: (req, res) => {
     return userService.svResetPassword(req, res);
   },
+  lock: (req, res) => {
+    return userService.svLock(req, res);
+  },
 };
 
 module.exports = userController;

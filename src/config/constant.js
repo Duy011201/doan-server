@@ -60,6 +60,7 @@ const constant = {
     SUCCESS_CREATE: 'Tạo thành công',
     SUCCESS_DELETE: 'Xóa thành công',
     SUCCESS_RESET_PASSWORD: 'Đặt lại mật khẩu thành công',
+    SUCCESS_UPDATE_USER: 'Cập nhật người dùng thành công',
 
     INCORRECT_EMAIL_OR_PASSWORD: 'Tài khoản hoặc mật khẩu không chính xác',
     INVALID_EMAIL_FORMAT: 'Định dạng email không hợp lệ',
@@ -71,6 +72,7 @@ const constant = {
 
     ERROR_COMPANY_CORPORATE_TAX_CODE_EXIT: 'Mã số thuế đã được đăng ký',
     ERROR_REGISTER_ACCOUNT: 'Lỗi đăng ký tài khoản',
+    ERROR_UPDATE_USER: 'Lỗi cập nhật người dùng',
     ERROR_FORGOT_PASSWORD: 'Lỗi lấy lại mật khẩu',
     ERROR_NOT_EXIT: 'Lỗi tài khoản không tồn tại',
     ERROR_LOCK_ACCOUNT: 'Lỗi tài khoản đã bị khóa',
