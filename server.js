@@ -10,6 +10,7 @@ const rateLimit = require('express-rate-limit');
 
 const routerAuth = require("./src/router/authRouter");
 const routerUser = require("./src/router/userRouter");
+const routerRole = require("./src/router/roleRouter");
 
 require("dotenv").config();
 
@@ -38,6 +39,7 @@ connectDB.connect();
 
 app.use('/api/auth', routerAuth);
 app.use("/api/admin/user", routerUser);
+app.use("/api/role", routerRole);
 
 app.listen(port, () => {
   console.log(`Server is listening on port ${port}`);
