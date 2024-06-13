@@ -3,6 +3,7 @@ const constant = {
     USER: 'user',
     ROLE: 'role',
     USER_ROLE: 'user_role',
+    FILE: 'file',
     COMPANY: 'company',
     VERIFY_CODE: 'verify_code',
   },
@@ -84,6 +85,8 @@ const constant = {
     ERROR_COMPANY_NOT_EXIT: 'Lỗi công ty không tồn tại',
     ERROR_ENCODE: 'Lỗi mã hóa mật khẩu',
     ERROR_ROLE: 'Lỗi quyền',
+    ERROR_UPLOAD_FILE: 'Lỗi upload file',
+    ERROR_NOT_FOUND_FILE: 'Lỗi không tìm thấy file',
   },
 };
 

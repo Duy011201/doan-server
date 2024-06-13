@@ -35,22 +35,22 @@ create table company
 
 create table user
 (
-    userID      varchar(36)                                       not null
+    userID      varchar(36)                                                   not null
         primary key,
-    companyID   varchar(36)                                       null,
-    username    varchar(255)                                      null,
-    email       varchar(50)                                       not null unique,
-    password    varchar(100)                                      not null,
-    phone       varchar(20)                                       null,
-    avatar      varchar(255)                                      null,
+    companyID   varchar(36)                                                   null,
+    username    varchar(255)                                                  null,
+    email       varchar(50)                                                   not null unique,
+    password    varchar(100)                                                  not null,
+    phone       varchar(20)                                                   null,
+    avatar      varchar(255)                                                  null,
     status      enum ('active', 'inactive', 'lock') default 'lock'            not null,
-    language    varchar(50)                                       null,
-    certificate varchar(100)                                      null,
-    education   varchar(255)                                      null,
-    createdAt   timestamp               default CURRENT_TIMESTAMP not null,
-    updatedAt   timestamp               default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
-    createdBy   varchar(36)             default 'system'          not null,
-    updatedBy   varchar(36)             default 'system'          not null,
+    language    varchar(50)                                                   null,
+    certificate varchar(100)                                                  null,
+    education   varchar(255)                                                  null,
+    createdAt   timestamp                           default CURRENT_TIMESTAMP not null,
+    updatedAt   timestamp                           default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
+    createdBy   varchar(36)                         default 'system'          not null,
+    updatedBy   varchar(36)                         default 'system'          not null,
     foreign key (companyID) references company (companyID)
 );
 
@@ -66,7 +66,6 @@ create table user_role
     foreign key (userID) references user (userID)
 );
 
-# Store verify_code for user unique act update code
 create table verify_code
 (
     verifyCodeID varchar(36)                                           not null
@@ -78,6 +77,21 @@ create table verify_code
     updatedAt    timestamp                   default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
     createdBy    varchar(36)                 default 'system'          not null,
     updatedBy    varchar(36)                 default 'system'          not null
+);
+
+create table file
+(
+    fileID    varchar(36)                                           not null
+        primary key,
+    userID    varchar(36)                                           null,
+    fileName  varchar(255)                                          not null,
+    fileType  varchar(255)                                          not null,
+    filePath  varchar(255)                                          not null unique,
+    status    enum ('active', 'inactive') default 'active'          not null,
+    createdAt timestamp                   default CURRENT_TIMESTAMP not null,
+    updatedAt timestamp                   default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
+    createdBy varchar(36)                 default 'system'          not null,
+    updatedBy varchar(36)                 default 'system'          not null
 );
 
 create table blog
