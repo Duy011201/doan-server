@@ -60,6 +60,7 @@ const constant = {
     SUCCESS_REFRESH_TOKEN: 'Lấy token mới thành công',
     SUCCESS_CREATE: 'Tạo thành công',
     SUCCESS_DELETE: 'Xóa thành công',
+    SUCCESS_LOCK: 'Khóa thành công',
     SUCCESS_RESET_PASSWORD: 'Đặt lại mật khẩu thành công',
     SUCCESS_UPDATE_USER: 'Cập nhật người dùng thành công',
 
@@ -81,6 +82,7 @@ const constant = {
     ERROR_ENCRYPTION_VERIFY_CODE: 'Lỗi mã xác thực không đúng',
     ERROR_EXPIRED_TOKEN: 'Lỗi mã xác thực hết hạn',
     ERROR_EMAIL_ALREADY_EXIT: 'Lỗi email đã tồn tại',
+    ERROR_CORPORATE_TAX_CODE_ALREADY_EXIT: 'Lỗi mã số thuế đã tồn tại',
     ERROR_USER_NOT_EXIT: 'Lỗi người dùng không tồn tại',
     ERROR_COMPANY_NOT_EXIT: 'Lỗi công ty không tồn tại',
     ERROR_ENCODE: 'Lỗi mã hóa mật khẩu',

@@ -268,7 +268,7 @@ const authService = {
                 .status(constant.SYSTEM_HTTP_STATUS.OK)
                 .json({
                     status: constant.SYSTEM_HTTP_STATUS.OK,
-                    message: constant.RESPONSE_MESSAGE.SUCCESS_DELETE
+                    message: constant.RESPONSE_MESSAGE.SUCCESS_LOCK
                 });
         } catch (err) {
             console.error('Error executing query lock user by id :', err.stack);
