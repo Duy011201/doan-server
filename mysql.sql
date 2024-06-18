@@ -13,24 +13,24 @@ create table role
 
 create table company
 (
-    companyID        varchar(36)                                       not null
+    companyID        varchar(36)                                                   not null
         primary key,
-    name             varchar(255)                                      not null,
-    contact          varchar(255)                                      null,
-    email            varchar(50)                                       null,
-    phone            varchar(20)                                       null,
-    province         varchar(255)                                      null,
-    address          varchar(255)                                      null,
-    field            varchar(255)                                      null,
-    logo             varchar(255)                                      null,
-    scale            varchar(6)                                        null,
-    corporateTaxCode varchar(100)                                      not null unique,
-    website          varchar(255)                                      null,
-    status           enum ('active', 'lock') default 'active'          not null,
-    createdAt        timestamp               default CURRENT_TIMESTAMP not null,
-    updatedAt        timestamp               default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
-    createdBy        varchar(36)             default 'system'          not null,
-    updatedBy        varchar(36)             default 'system'          not null
+    name             varchar(255)                                                  not null,
+    introduce        longtext                                                      null,
+    email            varchar(50)                                                   null,
+    phone            varchar(20)                                                   null,
+    province         varchar(255)                                                  null,
+    address          varchar(255)                                                  null,
+    field            varchar(255)                                                  null,
+    logo             varchar(255)                                                  null,
+    scale            int                                                           null,
+    corporateTaxCode varchar(100)                                                  not null unique,
+    website          varchar(255)                                                  null,
+    status           enum ('active', 'lock', 'inactive') default 'active'          not null,
+    createdAt        timestamp                           default CURRENT_TIMESTAMP not null,
+    updatedAt        timestamp                           default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
+    createdBy        varchar(36)                         default 'system'          not null,
+    updatedBy        varchar(36)                         default 'system'          not null
 );
 
 create table user
@@ -84,6 +84,7 @@ create table file
     fileID    varchar(36)                                           not null
         primary key,
     userID    varchar(36)                                           null,
+    companyID varchar(36)                                           null,
     fileName  varchar(255)                                          not null,
     fileType  varchar(255)                                          not null,
     filePath  varchar(255)                                          not null unique,
@@ -101,7 +102,7 @@ create table blog
     status    enum ('active', 'inactive') default 'active'          not null,
     title     varchar(255)                                          not null,
     keyword   varchar(255)                                          not null,
-    content   TEXT                                                  not null,
+    content   longtext                                              not null,
     createdAt timestamp                   default CURRENT_TIMESTAMP not null,
     updatedAt timestamp                   default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
     createdBy varchar(36)                 default 'system'          not null,

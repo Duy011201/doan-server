@@ -78,7 +78,6 @@ const authService = {
     svRegister: async (req, res) => {
         const payload = req.body;
         const userID = uuidv4();
-        const userRoleID = uuidv4();
         const companyID = uuidv4();
         const today = new Date();
 

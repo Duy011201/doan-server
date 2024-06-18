@@ -3,11 +3,26 @@ const {querySQl} = require('../core/repository');
 const path = require("path");
 const {isEmpty} = require("../core/func");
 const {v4: uuidv4} = require('uuid');
+const Joi = require('joi');
 
 const storeService = {
     svUpload: async (req, res) => {
         try {
             const payload = req.body;
+
+            const schema = Joi.object({
+                userID: Joi.string().allow(''),
+                companyID: Joi.string().allow('')
+            });
+
+            const {error} = schema.validate(payload);
+            if (error) {
+                return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST)
+                    .json({
+                        status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
+                        massage: error.details[0].message
+                    });
+            }
 
             if (!req.files) {
                 return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST).json({
@@ -16,17 +31,18 @@ const storeService = {
                 });
             }
 
-            console.log(req.files)
-
             const uploadedFiles = await Promise.all(req.files.map(async (file) => {
                 try {
                     const fileID = uuidv4();
                     if (!isEmpty(payload.userID)) {
                         await querySQl(`INSERT INTO ${constant.TABLE_DATABASE.FILE} (fileID, userID, fileName, fileType, filePath)
-                                VALUES (?, ?, ?, ?, ?)`, [fileID, payload.userID, file.filename, file.mimetype, file.path]);
+                                        VALUES (?, ?, ?, ?, ?)`, [fileID, payload.userID, file.filename, file.mimetype, file.path]);
+                    } else if (!isEmpty(payload.companyID)) {
+                        await querySQl(`INSERT INTO ${constant.TABLE_DATABASE.FILE} (fileID, companyID, fileName, fileType, filePath)
+                                        VALUES (?, ?, ?, ?, ?)`, [fileID, payload.companyID, file.filename, file.mimetype, file.path]);
                     } else {
                         await querySQl(`INSERT INTO ${constant.TABLE_DATABASE.FILE} (fileID, fileName, fileType, filePath)
-                                VALUES (?, ?, ?, ?)`, [fileID, file.filename, file.mimetype, file.path]);
+                                        VALUES (?, ?, ?, ?)`, [fileID, file.filename, file.mimetype, file.path]);
                     }
                     return {
                         fileName: file.filename,

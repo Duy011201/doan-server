@@ -128,16 +128,29 @@ const authService = {
         }
 
         try {
-            let userDB = await querySQl(`SELECT *
-                                         FROM ${constant.TABLE_DATABASE.USER} as u
-                                         WHERE u.userID = ?`, [payload.userID]);
+            let user1DB = await querySQl(`SELECT *
+                                          FROM ${constant.TABLE_DATABASE.USER} as u
+                                          WHERE u.userID = ?`, [payload.userID]);
 
-            if (isEmpty(userDB)) {
+            if (isEmpty(user1DB)) {
                 return res
                     .status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST)
                     .json({
                         status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
                         message: constant.RESPONSE_MESSAGE.ERROR_USER_NOT_EXIT
+                    });
+            }
+
+            let user2DB = await querySQl(`SELECT *
+                                          FROM ${constant.TABLE_DATABASE.USER} as u
+                                          WHERE u.email = ?`, [payload.email]);
+
+            if (isEmpty(user2DB)) {
+                return res
+                    .status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST)
+                    .json({
+                        status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
+                        message: constant.RESPONSE_MESSAGE.ERROR_EMAIL_ALREADY_EXIT
                     });
             }
 
@@ -153,36 +166,22 @@ const authService = {
                             status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
                             message: constant.RESPONSE_MESSAGE.ERROR_COMPANY_NOT_EXIT
                         });
-
-                await querySQl(`UPDATE ${constant.TABLE_DATABASE.USER}
-                                SET username    = ?,
-                                    companyID   = ?,
-                                    email       = ?,
-                                    avatar      = ?,
-                                    phone       = ?,
-                                    status      = ?,
-                                    language    = ?,
-                                    certificate = ?,
-                                    education   = ?,
-                                    updatedBy   = ?
-                                WHERE userID = ?`
-                    , [payload.username, payload.companyID, payload.email, payload.avatar, payload.phone, payload.status,
-                        payload.language, payload.certificate, payload.education, payload.updatedBy, payload.userID]);
-            } else {
-                await querySQl(`UPDATE ${constant.TABLE_DATABASE.USER}
-                                SET username    = ?,
-                                    email       = ?,
-                                    avatar      = ?,
-                                    phone       = ?,
-                                    status      = ?,
-                                    language    = ?,
-                                    certificate = ?,
-                                    education   = ?,
-                                    updatedBy   = ?
-                                WHERE userID = ?`
-                    , [payload.username, payload.email, payload.avatar, payload.phone, payload.status,
-                        payload.language, payload.certificate, payload.education, payload.updatedBy, payload.userID]);
             }
+
+            await querySQl(`UPDATE ${constant.TABLE_DATABASE.USER}
+                            SET username    = ?,
+                                companyID   = ?,
+                                email       = ?,
+                                avatar      = ?,
+                                phone       = ?,
+                                status      = ?,
+                                language    = ?,
+                                certificate = ?,
+                                education   = ?,
+                                updatedBy   = ?
+                            WHERE userID = ?`
+                , [payload.username, payload.companyID, payload.email, payload.avatar, payload.phone, payload.status,
+                    payload.language, payload.certificate, payload.education, payload.updatedBy, payload.userID]);
 
             await querySQl(`UPDATE ${constant.TABLE_DATABASE.USER_ROLE}
                             SET roleID    = ?,
@@ -194,7 +193,7 @@ const authService = {
                 .status(constant.SYSTEM_HTTP_STATUS.OK)
                 .json({
                     status: constant.SYSTEM_HTTP_STATUS.OK,
-                    message: constant.RESPONSE_MESSAGE.SUCCESS_UPDATE_USER
+                    message: constant.RESPONSE_MESSAGE.SUCCESS_UPDATE
                 });
         } catch (err) {
             console.error('Error executing query update :', err.stack);
@@ -223,9 +222,8 @@ const authService = {
         }
 
         try {
-            await querySQl(`UPDATE ${constant.TABLE_DATABASE.USER} as u
-                            SET u.status = ?
-                            WHERE u.userID = ?`, [constant.SYSTEM_STATUS.IN_ACTIVE, payload.userID]);
+            await querySQl(`DELETE FROM ${constant.TABLE_DATABASE.USER} as u
+                            WHERE u.userID = ?`, [payload.userID]);
 
             return res
                 .status(constant.SYSTEM_HTTP_STATUS.OK)
