@@ -5,6 +5,7 @@ const constant = {
     USER_ROLE: 'user_role',
     FILE: 'file',
     COMPANY: 'company',
+    BLOG: 'blog',
     VERIFY_CODE: 'verify_code',
   },
   SYSTEM_HTTP_STATUS: {
@@ -30,10 +31,10 @@ const constant = {
     SERVICE_UNAVAILABLE: 'Service Unavailable',
   },
   SYSTEM_ROLE: {
-    SUPER_ADMIN: 'super_admin',
-    ADMIN: 'admin',
-    CANDIDATE: 'candidate',
-    EMPLOYER: 'employer',
+    SUPER_ADMIN: 'SUPER_ADMIN',
+    ADMIN: 'ADMIN',
+    CANDIDATE: 'CANDIDATE',
+    EMPLOYER: 'EMPLOYER',
   },
   SYSTEM_ROLE_DESC: {
     SUPPER_ADMIN: 'Quản trị toàn bộ hệ thống',
@@ -42,15 +43,21 @@ const constant = {
     EMPLOYER: 'Nhà tuển dụng',
   },
   SYSTEM_STATUS: {
-    ACTIVE: 'active',
-    IN_ACTIVE: 'inactive',
-    LOCK: 'lock',
+    ACTIVE: 'ACTIVE',
+    IN_ACTIVE: 'IN_ACTIVE',
+    LOCK: 'LOCK',
+  },
+  BLOG_STATUS: {
+    PENDING: 'PENDING',
+    APPROVED: 'APPROVED',
+    PUBLISHED: 'PUBLISHED',
+    ARCHIVED: 'ARCHIVED'
   },
   SQL_METHOD: {
-    GET: 'get',
-    DELETE: 'delete',
-    INSERT: 'insert',
-    UPDATE: 'update',
+    GET: 'GET',
+    DELETE: 'DELETE',
+    INSERT: 'INSERT',
+    UPDATE: 'UPDATE',
   },
   RESPONSE_MESSAGE: {
     SUCCESS_REGISTER_ACCOUNT: 'Đăng ký tài khoản thành công',
@@ -83,6 +90,7 @@ const constant = {
     ERROR_EXPIRED_TOKEN: 'Lỗi mã xác thực hết hạn',
     ERROR_EMAIL_ALREADY_EXIT: 'Lỗi email đã tồn tại',
     ERROR_CORPORATE_TAX_CODE_ALREADY_EXIT: 'Lỗi mã số thuế đã tồn tại',
+    ERROR_KEYWORD_EXIT: 'Lỗi keyword đã tồn tại',
     ERROR_USER_NOT_EXIT: 'Lỗi người dùng không tồn tại',
     ERROR_COMPANY_NOT_EXIT: 'Lỗi công ty không tồn tại',
     ERROR_ENCODE: 'Lỗi mã hóa mật khẩu',
