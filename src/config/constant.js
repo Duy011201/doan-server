@@ -69,6 +69,7 @@ const constant = {
     SUCCESS_LOCK: 'Khóa thành công',
     SUCCESS_RESET_PASSWORD: 'Đặt lại mật khẩu thành công',
     SUCCESS_UPDATE: 'Cập nhật thành công',
+    SUCCESS_SEND_EMAIL: 'Gửi email thành công',
 
     INCORRECT_EMAIL_OR_PASSWORD: 'Tài khoản hoặc mật khẩu không chính xác',
     INVALID_EMAIL_FORMAT: 'Định dạng email không hợp lệ',
