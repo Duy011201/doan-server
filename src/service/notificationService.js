@@ -7,13 +7,15 @@ const Joi = require('joi');
 const {sendEmail} = require("../common/nodemailer");
 
 const notificationService = {
-    svInfo: async (req, res) => {
+    svSendContentEmail: async (req, res) => {
         try {
             const payload = req.body;
 
             const schema = Joi.object({
-                role: Joi.string().required(),
-                text: Joi.string().required(),
+                userID: Joi.string().allow(''),
+                role: Joi.string().allow(''),
+                content: Joi.string().required(),
+                token: Joi.string().required()
             });
 
             const {error} = schema.validate(payload);
@@ -25,13 +27,22 @@ const notificationService = {
                     });
             }
 
-            let userDB = await querySQl(`SELECT u.email
+            let userDB;
+
+            if (payload.userID) {
+                userDB = await querySQl(`SELECT u.email
+                                         FROM ${constant.TABLE_DATABASE.USER} as u
+                                         WHERE u.userID = ?`, [payload.userID]);
+            } else {
+                userDB = await querySQl(`SELECT u.email
                                          FROM ${constant.TABLE_DATABASE.USER} as u
                                                   JOIN ${constant.TABLE_DATABASE.USER_ROLE} ur
                                                        ON ur.userID = u.userID
                                                   JOIN ${constant.TABLE_DATABASE.ROLE} r
                                                        ON ur.roleID = r.roleID
                                          WHERE r.name = ?`, [payload.role]);
+            }
+
             await Promise.all(userDB.map(async (user) => {
                 await sendEmail(user.email, process.env.SERVER_NAME, `${payload.text}`)
             }))

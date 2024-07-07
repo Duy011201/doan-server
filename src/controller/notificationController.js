@@ -1,8 +1,8 @@
 const notificationService = require('../service/notificationService');
 
 const notificationController = {
-    info: (req, res) => {
-        return notificationService.svInfo(req, res);
+    sendContentEmail: (req, res) => {
+        return notificationService.svSendContentEmail(req, res);
     },
 };
 
