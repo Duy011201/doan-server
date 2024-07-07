@@ -110,6 +110,8 @@ const authService = {
                         message: constant.RESPONSE_MESSAGE.ERROR_EMAIL_ALREADY_EXIT
                     });
 
+            console.log(userDB)
+
             const verifyCodeDB = await querySQl(`SELECT *
                                                  FROM ${constant.TABLE_DATABASE.VERIFY_CODE} as v
                                                  WHERE v.email = ?`, [payload.email]);
@@ -146,7 +148,7 @@ const authService = {
 
             if (payload.role === constant.SYSTEM_ROLE.CANDIDATE)
                 await querySQl(`INSERT INTO ${constant.TABLE_DATABASE.USER} (userID, email, password, status)
-                                VALUES (?, ?, ?, ?)`, [userID, payload.email, hashPassword, constant.SYSTEM_STATUS.ACTIVE])
+                                VALUES (?, ?, ?, ?)`, [userID, payload.email, hashPassword, constant.SYSTEM_STATUS.ACTIVE]);
 
             let roleDB = await querySQl(`SELECT r.roleID
                                          FROM ${constant.TABLE_DATABASE.ROLE} as r
@@ -213,9 +215,9 @@ const authService = {
                 await querySQl(`UPDATE ${constant.TABLE_DATABASE.VERIFY_CODE}
                                 SET code      = ?,
                                     email     = ?,
-                                    status    = ?,
+                                    status    = ?
                                 WHERE verifyCodeID = ?`,
-                    [verifyCode, payload.email, constant.SYSTEM_STATUS.ACTIVE, verifyCodeDB[0]['verifyCodeID']]);
+                    [verifyCode, payload.email, constant.SYSTEM_STATUS.ACTIVE, `${verifyCodeDB[0]['verifyCodeID']}`]);
             }
 
             await sendEmail(process.env.SERVER_EMAIL_ADDRESS_TEST, process.env.SERVER_NAME, `Mã xác thực của bạn là: ${verifyCode}`)

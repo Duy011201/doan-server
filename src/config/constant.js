@@ -51,7 +51,6 @@ const constant = {
     PENDING: 'PENDING',
     APPROVED: 'APPROVED',
     PUBLISHED: 'PUBLISHED',
-    ARCHIVED: 'ARCHIVED'
   },
   SQL_METHOD: {
     GET: 'GET',
