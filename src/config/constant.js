@@ -7,6 +7,7 @@ const constant = {
     COMPANY: 'company',
     BLOG: 'blog',
     VERIFY_CODE: 'verify_code',
+    SERVICE_PACK: 'service_pack',
   },
   SYSTEM_HTTP_STATUS: {
     OK: 200,
@@ -97,6 +98,8 @@ const constant = {
     ERROR_ROLE: 'Lỗi quyền',
     ERROR_UPLOAD_FILE: 'Lỗi upload file',
     ERROR_NOT_FOUND_FILE: 'Lỗi không tìm thấy file',
+    ERROR_SERVICE_PACK_NAME: 'Lỗi tên gói dịch vụ',
+    ERROR_NOT_FOUND_SERVICE_PACK: 'Lỗi không tìm thấy gói dịch vụ',
   },
 };
 

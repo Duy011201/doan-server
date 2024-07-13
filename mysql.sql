@@ -96,10 +96,11 @@ create table blog (
     updatedBy varchar(36) default 'system' not null
 );
 
-create table service (
-    serviceID varchar(36) not null primary key,
-    serviceName varchar(255) not null,
+create table service_pack (
+    servicePackID varchar(36) not null primary key,
+    servicePackName varchar(255) not null,
     price DECIMAL(10, 2) NOT NULL,
+    promotion DECIMAL(10, 2) NOT NULL,
     content longtext not null,
     createdAt timestamp default CURRENT_TIMESTAMP not null,
     updatedAt timestamp default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
@@ -109,7 +110,7 @@ create table service (
 
 create table product (
     productID varchar(36) not null primary key,
-    serviceID varchar(36) not null,
+    servicePackID varchar(36) not null,
     userID varchar(36) not null,
     status enum ('DRAFT', 'PAID') default 'DRAFT' not null,
     createdAt timestamp default CURRENT_TIMESTAMP not null,
@@ -117,7 +118,7 @@ create table product (
     createdBy varchar(36) default 'system' not null,
     updatedBy varchar(36) default 'system' not null,
     foreign key (userID) references user (userID),
-    foreign key (serviceID) REFERENCES service(serviceID)
+    foreign key (servicePackID) REFERENCES servicePack(servicePackID)
 );
 
 CREATE TABLE cart (
