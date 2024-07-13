@@ -15,6 +15,7 @@ const routerCompany = require("./src/router/companyRouter");
 const routerBlog = require("./src/router/blogRouter");
 const uploadRole = require("./src/router/storeRouter");
 const routerNotification = require("./src/router/notificationRouter");
+const routerService = require("./src/router/serviceRouter");
 
 require("dotenv").config();
 
@@ -51,6 +52,7 @@ app.use("/api/role", routerRole);
 app.use("/api/company", routerCompany);
 app.use("/api/blog", routerBlog);
 app.use("/api/notification", routerNotification);
+app.use("/api/service", routerService);
 
 app.listen(port, () => {
     console.log(`Server is listening on port ${port}`);

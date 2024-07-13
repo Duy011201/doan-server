@@ -3,7 +3,7 @@
     "start": "nodemon server",
     "test": "echo \"Error: no test specified\" && exit 1",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,html,css,scss}\"",
-    "lint": "eslint --config eslint.config.js \"src/**/*.{ts,tsx,js,jsx}\""
+    "lint": "eslint --fix --config eslint.config.js \"src/**/*.{ts,tsx,js,jsx}\""
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
