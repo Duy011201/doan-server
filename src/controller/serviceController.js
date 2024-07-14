@@ -1,18 +1,18 @@
-const service = require('../service/serviceService');
+const servicePack = require('../service/servicePackService');
 
-const userController = {
+const servicePackController = {
   create: (req, res) => {
-    return service.svCreate(req, res);
+    return servicePack.svCreate(req, res);
   },
   update: (req, res) => {
-    return service.svUpdate(req, res);
+    return servicePack.svUpdate(req, res);
   },
   getAll: (req, res) => {
-    return service.svGetAll(req, res);
+    return servicePack.svGetAll(req, res);
   },
   delete: (req, res) => {
-    return service.svDelete(req, res);
+    return servicePack.svDelete(req, res);
   },
 };
 
-module.exports = userController;
+module.exports = servicePackController;
