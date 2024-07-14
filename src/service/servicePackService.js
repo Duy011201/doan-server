@@ -4,7 +4,7 @@ const Joi = require('joi');
 const { v4: uuidv4 } = require('uuid');
 const { isEmpty, bcryptHashPassword } = require('../core/func');
 
-const serviceService = {
+const servicePackService = {
   svCreate: async (req, res) => {
     const servicePackID = uuidv4();
     const payload = req.body;
@@ -14,6 +14,7 @@ const serviceService = {
       price: Joi.number().required(),
       content: Joi.string().required(),
       promotion: Joi.number().required(),
+      expirationDate: Joi.number().required(),
       createdBy: Joi.string().required(),
       token: Joi.string().required(),
     });
@@ -40,14 +41,15 @@ const serviceService = {
       }
 
       await querySQl(
-        `INSERT INTO ${constant.TABLE_DATABASE.SERVICE_PACK} (servicePackID, servicePackName, price, content, promotion, createdBy)
-                            VALUES (?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO ${constant.TABLE_DATABASE.SERVICE_PACK} (servicePackID, servicePackName, price, content, promotion, expirationDate, createdBy)
+                            VALUES (?, ?, ?, ?, ?, ?, ?)`,
         [
           servicePackID,
           payload.servicePackName,
           payload.price,
           payload.content,
           payload.promotion,
+          payload.expirationDate,
           payload.createdBy,
         ]
       );
@@ -74,6 +76,7 @@ const serviceService = {
       price: Joi.number().required(),
       content: Joi.string().required(),
       promotion: Joi.number().required(),
+      expirationDate: Joi.number().required(),
       updatedBy: Joi.string().required(),
       token: Joi.string().required(),
     });
@@ -107,6 +110,7 @@ const serviceService = {
                                 price = ?,
                                 content = ?,
                                 promotion = ?,
+                                expirationDate = ?,
                                 updatedBy = ?
                             WHERE servicePackID = ?`,
         [
@@ -114,6 +118,7 @@ const serviceService = {
           payload.price,
           payload.content,
           payload.promotion,
+          payload.expirationDate,
           payload.updatedBy,
           payload.servicePackID,
         ]
@@ -193,4 +198,4 @@ const serviceService = {
   },
 };
 
-module.exports = serviceService;
+module.exports = servicePackService;
