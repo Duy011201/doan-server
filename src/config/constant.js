@@ -57,6 +57,7 @@ const constant = {
   },
   PRODUCT_STATUS: {
     DRAFT: 'DRAFT',
+    PENDING: 'PENDING',
     PAID: 'PAID',
   },
   SQL_METHOD: {

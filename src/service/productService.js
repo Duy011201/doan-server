@@ -26,29 +26,29 @@ const productService = {
     }
 
     try {
-      let servicePack1DB = await querySQl(
+      let servicePackDB = await querySQl(
         `SELECT *
                                          FROM ${constant.TABLE_DATABASE.SERVICE_PACK} as s
                                          WHERE s.servicePackID = ?`,
         [payload.servicePackID]
       );
-      if (isEmpty(servicePack1DB)) {
+      if (isEmpty(servicePackDB)) {
         return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST).json({
           message: constant.RESPONSE_MESSAGE.ERROR_NOT_FOUND_SERVICE_PACK,
         });
       }
 
-      let servicePack2DB = await querySQl(
-        `SELECT *
-                                         FROM ${constant.TABLE_DATABASE.PRODUCT} as p
-                                         WHERE p.servicePackID = ?`,
-        [payload.servicePackID]
-      );
-      if (!isEmpty(servicePack2DB)) {
-        return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST).json({
-          message: constant.RESPONSE_MESSAGE.ERROR_SERVICE_PACK_EXIT,
-        });
-      }
+      // let servicePack2DB = await querySQl(
+      //   `SELECT *
+      //                                    FROM ${constant.TABLE_DATABASE.PRODUCT} as p
+      //                                    WHERE p.servicePackID = ?`,
+      //   [payload.servicePackID]
+      // );
+      // if (!isEmpty(servicePack2DB)) {
+      //   return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST).json({
+      //     message: constant.RESPONSE_MESSAGE.ERROR_SERVICE_PACK_EXIT,
+      //   });
+      // }
 
       let userDB = await querySQl(
         `SELECT *
@@ -94,6 +94,7 @@ const productService = {
     const schema = Joi.object({
       productID: Joi.string().required(),
       status: Joi.string().required(),
+      servicePackID: Joi.string().required(),
       updatedBy: Joi.string().required(),
       token: Joi.string().required(),
     });
@@ -110,8 +111,8 @@ const productService = {
       let productDB = await querySQl(
         `SELECT *
                                          FROM ${constant.TABLE_DATABASE.PRODUCT} as p
-                                         WHERE p.productID = ?`,
-        [payload.productID]
+                                         ORDER BY totalExpiration DESC`,
+        []
       );
       if (isEmpty(productDB)) {
         return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST).json({
@@ -119,43 +120,66 @@ const productService = {
         });
       }
 
-      let servicePackDB = await querySQl(
+      let servicePackInProductDB = await querySQl(
         `SELECT *
-                                         FROM ${constant.TABLE_DATABASE.SERVICE_PACK} as p
-                                         WHERE p.servicePackID = ?`,
-        [payload.servicePackID]
+                                         FROM ${constant.TABLE_DATABASE.PRODUCT} as p
+                                         WHERE p.servicePackID = ? AND p.status = ? AND p.productID <> ?`,
+        [
+          payload.servicePackID,
+          constant.PRODUCT_STATUS.PENDING,
+          payload.productID,
+        ]
       );
-      if (isEmpty(servicePackDB)) {
-        return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST).json({
-          message: constant.RESPONSE_MESSAGE.ERROR_NOT_FOUND_SERVICE_PACK,
-        });
+
+      if (
+        servicePackInProductDB.length > 0 &&
+        payload.status === constant.PRODUCT_STATUS.PAID
+      ) {
+        let servicePackDB = await querySQl(
+          `SELECT *
+                                           FROM ${constant.TABLE_DATABASE.SERVICE_PACK} as s
+                                           WHERE s.servicePackID = ?`,
+          [payload.servicePackID]
+        );
+        await querySQl(
+          `UPDATE ${constant.TABLE_DATABASE.PRODUCT}
+                                SET status = ?,
+                                    totalExpiration = ?,
+                                    updatedBy = ?
+                                WHERE productID = ?`,
+          [
+            payload.status,
+            Number(productDB[0].totalExpiration) +
+              Number(servicePackDB[0].expirationDate),
+            payload.updatedBy,
+            productDB[0].productID,
+          ]
+        );
+        await querySQl(
+          `DELETE FROM ${constant.TABLE_DATABASE.PRODUCT} as p
+                              WHERE p.productID = ?`,
+          [servicePackInProductDB[0].productID]
+        );
+
+        await querySQl(
+          `INSERT INTO ${constant.TABLE_DATABASE.HISTORY} (historyID, productID, status, createdBy)
+                                VALUES (?, ?, ?, ?)`,
+          [
+            historyID,
+            payload.productID,
+            constant.PRODUCT_STATUS.PAID,
+            payload.updatedBy,
+          ]
+        );
+      } else {
+        await querySQl(
+          `UPDATE ${constant.TABLE_DATABASE.PRODUCT}
+                                SET status = ?,
+                                    updatedBy = ?
+                                WHERE productID = ?`,
+          [payload.status, payload.updatedBy, payload.productID]
+        );
       }
-
-      let userDB = await querySQl(
-        `SELECT *
-                                         FROM ${constant.TABLE_DATABASE.USER} as u
-                                         WHERE u.userID = ?`,
-        [payload.updatedBy]
-      );
-      if (isEmpty(userDB)) {
-        return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST).json({
-          message: constant.RESPONSE_MESSAGE.ERROR_USER_NOT_EXIT,
-        });
-      }
-
-      await querySQl(
-        `UPDATE ${constant.TABLE_DATABASE.PRODUCT}
-                            SET status = ?,
-                                updatedBy = ?
-                            WHERE productID = ?`,
-        [payload.status, payload.updatedBy, payload.productID]
-      );
-
-      await querySQl(
-        `INSERT INTO ${constant.TABLE_DATABASE.HISTORY} (historyID, productID, createdBy)
-                            VALUES (?, ?, ?, ?, ?)`,
-        [historyID, payload.productID, payload.updatedBy]
-      );
 
       return res.status(constant.SYSTEM_HTTP_STATUS.OK).json({
         status: constant.SYSTEM_HTTP_STATUS.OK,
@@ -200,8 +224,8 @@ const productService = {
       }
 
       await querySQl(
-        `DELETE FROM ${constant.TABLE_DATABASE.PRODUCT} as u
-                            WHERE u.productID = ?`,
+        `DELETE FROM ${constant.TABLE_DATABASE.PRODUCT} as p
+                            WHERE p.productID = ?`,
         [payload.productID]
       );
 
@@ -223,6 +247,7 @@ const productService = {
     const payload = req.body;
     const schema = Joi.object({
       userID: Joi.string().required(),
+      status: Joi.string(),
       token: Joi.string().required(),
     });
 
@@ -234,22 +259,17 @@ const productService = {
       });
     }
 
-    if (error) {
-      return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST).json({
-        status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
-        massage: error.details[0].message,
-      });
-    }
-
-    try {
-      let productDB = await querySQl(
-        `SELECT p.*, s.servicePackName, s.image, s.price, s.promotion, s.content, s.expirationDate
+    let sql = `SELECT p.*, s.servicePackName, s.image, s.price, s.promotion, s.content, s.expirationDate
                                       FROM ${constant.TABLE_DATABASE.PRODUCT} AS p
                                          LEFT JOIN ${constant.TABLE_DATABASE.SERVICE_PACK} AS s
                                                    ON s.servicePackID = p.servicePackID
-                                                  WHERE p.status = '${constant.PRODUCT_STATUS.DRAFT}'
-                                                  and p.userID = '${payload.userID}'`
-      );
+                                                  WHERE p.userID = '${payload.userID}'`;
+    if (payload.status) {
+      sql += p.status = `and ${payload.status}`;
+    }
+
+    try {
+      let productDB = await querySQl(sql);
       return res.status(constant.SYSTEM_HTTP_STATUS.OK).json({
         status: constant.SYSTEM_HTTP_STATUS.OK,
         data: productDB,

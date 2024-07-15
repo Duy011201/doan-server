@@ -114,7 +114,8 @@ create table product (
     productID varchar(36) not null primary key,
     servicePackID varchar(36) not null,
     userID varchar(36) not null,
-    status enum ('DRAFT', 'PENDING', 'EXPIRE', 'PAID') default 'DRAFT' not null,
+    status enum ('DRAFT', 'PENDING', 'PAID') default 'DRAFT' not null,
+    totalExpiration DECIMAL(10, 2) not null default 0,
     createdAt timestamp default CURRENT_TIMESTAMP not null,
     updatedAt timestamp default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
     createdBy varchar(36) default 'system' not null,
@@ -126,6 +127,7 @@ create table product (
 create table history (
     historyID varchar(36) not null primary key,
     productID varchar(36) not null,
+    status enum ('PAID') default 'PAID' not null,
     createdAt timestamp default CURRENT_TIMESTAMP not null,
     updatedAt timestamp default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
     createdBy varchar(36) default 'system' not null,

@@ -207,7 +207,7 @@ const blogService = {
   },
   svGetAll: async (req, res) => {
     try {
-      let blogDB = await querySQl(`SELECT b.*, u.username
+      let blogDB = await querySQl(`SELECT b.*, u.username, u.email
                                 FROM ${constant.TABLE_DATABASE.BLOG} AS b
                                          LEFT JOIN ${constant.TABLE_DATABASE.USER} AS u
                                                    ON u.userID = b.createdBy`);
