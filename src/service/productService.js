@@ -162,11 +162,11 @@ const productService = {
         );
 
         await querySQl(
-          `INSERT INTO ${constant.TABLE_DATABASE.HISTORY} (historyID, productID, status, createdBy)
+          `INSERT INTO ${constant.TABLE_DATABASE.HISTORY} (historyID, servicePackID, status, createdBy)
                                 VALUES (?, ?, ?, ?)`,
           [
             historyID,
-            payload.productID,
+            payload.servicePackID,
             constant.PRODUCT_STATUS.PAID,
             payload.updatedBy,
           ]
