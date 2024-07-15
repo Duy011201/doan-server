@@ -102,6 +102,8 @@ create table service_pack (
     price DECIMAL(10, 2) NOT NULL,
     promotion DECIMAL(10, 2) NOT NULL,
     content longtext not null,
+    expirationDate DECIMAL(10, 2) not null,
+    image varchar(255) not null,
     createdAt timestamp default CURRENT_TIMESTAMP not null,
     updatedAt timestamp default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
     createdBy varchar(36) default 'system' not null,
@@ -112,23 +114,23 @@ create table product (
     productID varchar(36) not null primary key,
     servicePackID varchar(36) not null,
     userID varchar(36) not null,
-    status enum ('DRAFT', 'PAID') default 'DRAFT' not null,
+    status enum ('DRAFT', 'PENDING', 'EXPIRE', 'PAID') default 'DRAFT' not null,
     createdAt timestamp default CURRENT_TIMESTAMP not null,
     updatedAt timestamp default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
     createdBy varchar(36) default 'system' not null,
     updatedBy varchar(36) default 'system' not null,
     foreign key (userID) references user (userID),
-    foreign key (servicePackID) REFERENCES servicePack(servicePackID)
+    foreign key (servicePackID) REFERENCES service_pack(servicePackID)
 );
 
-CREATE TABLE cart (
-    cartID varchar(36) not null primary key,
-    userID varchar(36) not null,
+create table history (
+    historyID varchar(36) not null primary key,
     productID varchar(36) not null,
-    quantity INT NOT NULL,
     createdAt timestamp default CURRENT_TIMESTAMP not null,
-    FOREIGN KEY (userID) REFERENCES user(userID),
-    FOREIGN KEY (productID) REFERENCES product(productID)
+    updatedAt timestamp default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
+    createdBy varchar(36) default 'system' not null,
+    updatedBy varchar(36) default 'system' not null,
+    foreign key (productID) REFERENCES product(productID)
 );
 
 # INSERT DATA

@@ -15,6 +15,7 @@ const servicePackService = {
       content: Joi.string().required(),
       promotion: Joi.number().required(),
       expirationDate: Joi.number().required(),
+      image: Joi.string().required(),
       createdBy: Joi.string().required(),
       token: Joi.string().required(),
     });
@@ -41,8 +42,8 @@ const servicePackService = {
       }
 
       await querySQl(
-        `INSERT INTO ${constant.TABLE_DATABASE.SERVICE_PACK} (servicePackID, servicePackName, price, content, promotion, expirationDate, createdBy)
-                            VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO ${constant.TABLE_DATABASE.SERVICE_PACK} (servicePackID, servicePackName, price, content, promotion, expirationDate, image, createdBy)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           servicePackID,
           payload.servicePackName,
@@ -50,6 +51,7 @@ const servicePackService = {
           payload.content,
           payload.promotion,
           payload.expirationDate,
+          payload.image,
           payload.createdBy,
         ]
       );
@@ -77,6 +79,7 @@ const servicePackService = {
       content: Joi.string().required(),
       promotion: Joi.number().required(),
       expirationDate: Joi.number().required(),
+      image: Joi.string().required(),
       updatedBy: Joi.string().required(),
       token: Joi.string().required(),
     });
@@ -111,6 +114,7 @@ const servicePackService = {
                                 content = ?,
                                 promotion = ?,
                                 expirationDate = ?,
+                                image = ?,
                                 updatedBy = ?
                             WHERE servicePackID = ?`,
         [
@@ -119,6 +123,7 @@ const servicePackService = {
           payload.content,
           payload.promotion,
           payload.expirationDate,
+          payload.image,
           payload.updatedBy,
           payload.servicePackID,
         ]

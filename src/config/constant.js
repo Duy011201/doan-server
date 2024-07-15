@@ -8,6 +8,8 @@ const constant = {
     BLOG: 'blog',
     VERIFY_CODE: 'verify_code',
     SERVICE_PACK: 'service_pack',
+    PRODUCT: 'product',
+    HISTORY: 'history',
   },
   SYSTEM_HTTP_STATUS: {
     OK: 200,
@@ -52,6 +54,10 @@ const constant = {
     PENDING: 'PENDING',
     APPROVED: 'APPROVED',
     PUBLISHED: 'PUBLISHED',
+  },
+  PRODUCT_STATUS: {
+    DRAFT: 'DRAFT',
+    PAID: 'PAID',
   },
   SQL_METHOD: {
     GET: 'GET',
@@ -99,7 +105,10 @@ const constant = {
     ERROR_UPLOAD_FILE: 'Lỗi upload file',
     ERROR_NOT_FOUND_FILE: 'Lỗi không tìm thấy file',
     ERROR_SERVICE_PACK_NAME: 'Lỗi tên gói dịch vụ',
+    ERROR_PRODUCT_EXIT: 'Lỗi sản phẩm đã tồn tại',
+    ERROR_PRODUCT_NOT_FOUND: 'Lỗi sản phẩm không tồn tại',
     ERROR_NOT_FOUND_SERVICE_PACK: 'Lỗi không tìm thấy gói dịch vụ',
+    ERROR_SERVICE_PACK_EXIT: 'Lỗi gói dịch vụ đã tồn tại vui lòng gia hạn',
   },
 };
 

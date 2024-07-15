@@ -1,0 +1,269 @@
+const constant = require('../config/constant');
+const { querySQl } = require('../core/repository');
+const Joi = require('joi');
+const { v4: uuidv4 } = require('uuid');
+const { isEmpty } = require('../core/func');
+const { PRODUCT_STATUS } = require('../config/constant');
+
+const productService = {
+  svCreate: async (req, res) => {
+    const productID = uuidv4();
+    const payload = req.body;
+
+    const schema = Joi.object({
+      servicePackID: Joi.string().required(),
+      userID: Joi.string().required(),
+      createdBy: Joi.string().required(),
+      token: Joi.string().required(),
+    });
+
+    const { error } = schema.validate(payload);
+    if (error) {
+      return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST).json({
+        status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
+        massage: error.details[0].message,
+      });
+    }
+
+    try {
+      let servicePack1DB = await querySQl(
+        `SELECT *
+                                         FROM ${constant.TABLE_DATABASE.SERVICE_PACK} as s
+                                         WHERE s.servicePackID = ?`,
+        [payload.servicePackID]
+      );
+      if (isEmpty(servicePack1DB)) {
+        return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST).json({
+          message: constant.RESPONSE_MESSAGE.ERROR_NOT_FOUND_SERVICE_PACK,
+        });
+      }
+
+      let servicePack2DB = await querySQl(
+        `SELECT *
+                                         FROM ${constant.TABLE_DATABASE.PRODUCT} as p
+                                         WHERE p.servicePackID = ?`,
+        [payload.servicePackID]
+      );
+      if (!isEmpty(servicePack2DB)) {
+        return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST).json({
+          message: constant.RESPONSE_MESSAGE.ERROR_SERVICE_PACK_EXIT,
+        });
+      }
+
+      let userDB = await querySQl(
+        `SELECT *
+                                         FROM ${constant.TABLE_DATABASE.USER} as u
+                                         WHERE u.userID = ?`,
+        [payload.userID]
+      );
+      if (isEmpty(userDB)) {
+        return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST).json({
+          message: constant.RESPONSE_MESSAGE.ERROR_USER_NOT_EXIT,
+        });
+      }
+
+      await querySQl(
+        `INSERT INTO ${constant.TABLE_DATABASE.PRODUCT} (productID, servicePackID, userID, status, createdBy)
+                            VALUES (?, ?, ?, ?, ?)`,
+        [
+          productID,
+          payload.servicePackID,
+          payload.userID,
+          PRODUCT_STATUS.DRAFT,
+          payload.createdBy,
+        ]
+      );
+
+      return res.status(constant.SYSTEM_HTTP_STATUS.OK).json({
+        status: constant.SYSTEM_HTTP_STATUS.OK,
+        message: constant.RESPONSE_MESSAGE.SUCCESS_CREATE,
+        data: { productID: productID },
+      });
+    } catch (err) {
+      console.error('Error executing query create product :', err.stack);
+      return res
+        .status(constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR)
+        .json({ message: constant.SYSTEM_HTTP_MESSAGE.INTERNAL_SERVER_ERROR });
+    }
+  },
+
+  svUpdate: async (req, res) => {
+    const payload = req.body;
+    const historyID = uuidv4();
+
+    const schema = Joi.object({
+      productID: Joi.string().required(),
+      status: Joi.string().required(),
+      updatedBy: Joi.string().required(),
+      token: Joi.string().required(),
+    });
+
+    const { error } = schema.validate(payload);
+    if (error) {
+      return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST).json({
+        status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
+        massage: error.details[0].message,
+      });
+    }
+
+    try {
+      let productDB = await querySQl(
+        `SELECT *
+                                         FROM ${constant.TABLE_DATABASE.PRODUCT} as p
+                                         WHERE p.productID = ?`,
+        [payload.productID]
+      );
+      if (isEmpty(productDB)) {
+        return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST).json({
+          message: constant.RESPONSE_MESSAGE.ERROR_PRODUCT_NOT_FOUND,
+        });
+      }
+
+      let servicePackDB = await querySQl(
+        `SELECT *
+                                         FROM ${constant.TABLE_DATABASE.SERVICE_PACK} as p
+                                         WHERE p.servicePackID = ?`,
+        [payload.servicePackID]
+      );
+      if (isEmpty(servicePackDB)) {
+        return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST).json({
+          message: constant.RESPONSE_MESSAGE.ERROR_NOT_FOUND_SERVICE_PACK,
+        });
+      }
+
+      let userDB = await querySQl(
+        `SELECT *
+                                         FROM ${constant.TABLE_DATABASE.USER} as u
+                                         WHERE u.userID = ?`,
+        [payload.updatedBy]
+      );
+      if (isEmpty(userDB)) {
+        return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST).json({
+          message: constant.RESPONSE_MESSAGE.ERROR_USER_NOT_EXIT,
+        });
+      }
+
+      await querySQl(
+        `UPDATE ${constant.TABLE_DATABASE.PRODUCT}
+                            SET status = ?,
+                                updatedBy = ?
+                            WHERE productID = ?`,
+        [payload.status, payload.updatedBy, payload.productID]
+      );
+
+      await querySQl(
+        `INSERT INTO ${constant.TABLE_DATABASE.HISTORY} (historyID, productID, createdBy)
+                            VALUES (?, ?, ?, ?, ?)`,
+        [historyID, payload.productID, payload.updatedBy]
+      );
+
+      return res.status(constant.SYSTEM_HTTP_STATUS.OK).json({
+        status: constant.SYSTEM_HTTP_STATUS.OK,
+        message: constant.RESPONSE_MESSAGE.SUCCESS_UPDATE,
+      });
+    } catch (err) {
+      console.error('Error executing query update service pack :', err.stack);
+      return res
+        .status(constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR)
+        .json({
+          status: constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR,
+          message: constant.SYSTEM_HTTP_MESSAGE.INTERNAL_SERVER_ERROR,
+        });
+    }
+  },
+  svDelete: async (req, res) => {
+    const payload = req.body;
+    const schema = Joi.object({
+      productID: Joi.string().required(),
+      token: Joi.string().required(),
+    });
+
+    const { error } = schema.validate(payload);
+    if (error) {
+      return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST).json({
+        status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
+        massage: error.details[0].message,
+      });
+    }
+
+    try {
+      let productDB = await querySQl(
+        `SELECT *
+                                         FROM ${constant.TABLE_DATABASE.PRODUCT} as p
+                                         WHERE p.productID = ?`,
+        [payload.productID]
+      );
+      if (isEmpty(productDB)) {
+        return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST).json({
+          message: constant.RESPONSE_MESSAGE.ERROR_PRODUCT_NOT_FOUND,
+        });
+      }
+
+      await querySQl(
+        `DELETE FROM ${constant.TABLE_DATABASE.PRODUCT} as u
+                            WHERE u.productID = ?`,
+        [payload.productID]
+      );
+
+      return res.status(constant.SYSTEM_HTTP_STATUS.OK).json({
+        status: constant.SYSTEM_HTTP_STATUS.OK,
+        message: constant.RESPONSE_MESSAGE.SUCCESS_DELETE,
+      });
+    } catch (err) {
+      console.error('Error executing query delete product by id :', err.stack);
+      return res
+        .status(constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR)
+        .json({
+          status: constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR,
+          message: constant.SYSTEM_HTTP_MESSAGE.INTERNAL_SERVER_ERROR,
+        });
+    }
+  },
+  svGetAll: async (req, res) => {
+    const payload = req.body;
+    const schema = Joi.object({
+      userID: Joi.string().required(),
+      token: Joi.string().required(),
+    });
+
+    const { error } = schema.validate(payload);
+    if (error) {
+      return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST).json({
+        status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
+        massage: error.details[0].message,
+      });
+    }
+
+    if (error) {
+      return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST).json({
+        status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
+        massage: error.details[0].message,
+      });
+    }
+
+    try {
+      let productDB = await querySQl(
+        `SELECT p.*, s.servicePackName, s.image, s.price, s.promotion, s.content, s.expirationDate
+                                      FROM ${constant.TABLE_DATABASE.PRODUCT} AS p
+                                         LEFT JOIN ${constant.TABLE_DATABASE.SERVICE_PACK} AS s
+                                                   ON s.servicePackID = p.servicePackID
+                                                  WHERE p.status = '${constant.PRODUCT_STATUS.DRAFT}'
+                                                  and p.userID = '${payload.userID}'`
+      );
+      return res.status(constant.SYSTEM_HTTP_STATUS.OK).json({
+        status: constant.SYSTEM_HTTP_STATUS.OK,
+        data: productDB,
+      });
+    } catch (err) {
+      console.error('Error executing query get all service pack :', err.stack);
+      return res
+        .status(constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR)
+        .json({
+          status: constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR,
+          message: constant.SYSTEM_HTTP_MESSAGE.INTERNAL_SERVER_ERROR,
+        });
+    }
+  },
+};
+
+module.exports = productService;
