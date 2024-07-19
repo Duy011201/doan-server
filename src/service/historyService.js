@@ -26,7 +26,7 @@ const productService = {
         await querySQl(`SELECT h.*, s.servicePackName, s.price, s.promotion, s.content, s.expirationDate, s.image FROM ${constant.TABLE_DATABASE.HISTORY} AS h
             LEFT JOIN ${constant.TABLE_DATABASE.SERVICE_PACK} AS s
                                                    ON s.servicePackID = h.servicePackID
-                                                  WHERE h.createdBy = '${payload.userID}'`);
+                                                  WHERE h.createdBy = '${payload.userID}' ORDER BY h.updatedAt DESC`);
       return res.status(constant.SYSTEM_HTTP_STATUS.OK).json({
         status: constant.SYSTEM_HTTP_STATUS.OK,
         data: historyDB,

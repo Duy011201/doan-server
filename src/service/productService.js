@@ -141,20 +141,45 @@ const productService = {
                                            WHERE s.servicePackID = ?`,
           [payload.servicePackID]
         );
-        await querySQl(
-          `UPDATE ${constant.TABLE_DATABASE.PRODUCT}
+        let productDB = await querySQl(
+          `SELECT *
+                                           FROM ${constant.TABLE_DATABASE.PRODUCT} as p
+                                           WHERE p.productID = ?`,
+          [payload.productID]
+        );
+
+        if (productDB[0].totalExpiration === 0) {
+          await querySQl(
+            `UPDATE ${constant.TABLE_DATABASE.PRODUCT}
                                 SET status = ?,
                                     totalExpiration = ?,
                                     updatedBy = ?
                                 WHERE productID = ?`,
-          [
-            payload.status,
-            Number(productDB[0].totalExpiration) +
-              Number(servicePackDB[0].expirationDate),
-            payload.updatedBy,
-            productDB[0].productID,
-          ]
-        );
+            [
+              payload.status,
+              Number(productDB[0].totalExpiration) +
+                Number(servicePackDB[0].expirationDate),
+              payload.updatedBy,
+              productDB[0].productID,
+            ]
+          );
+        } else {
+          await querySQl(
+            `UPDATE ${constant.TABLE_DATABASE.PRODUCT}
+                                SET status = ?,
+                                    totalExpiration = ?,
+                                    updatedAt = ?
+                                WHERE productID = ?`,
+            [
+              payload.status,
+              Number(productDB[0].totalExpiration) +
+                Number(servicePackDB[0].expirationDate),
+              productDB[0].updatedAt,
+              productDB[0].productID,
+            ]
+          );
+        }
+
         await querySQl(
           `DELETE FROM ${constant.TABLE_DATABASE.PRODUCT} as p
                               WHERE p.productID = ?`,
@@ -246,8 +271,8 @@ const productService = {
   svGetAll: async (req, res) => {
     const payload = req.body;
     const schema = Joi.object({
-      userID: Joi.string().required(),
-      status: Joi.string(),
+      userID: Joi.string().allow(''),
+      status: Joi.string().allow(''),
       token: Joi.string().required(),
     });
 
@@ -259,17 +284,32 @@ const productService = {
       });
     }
 
-    let sql = `SELECT p.*, s.servicePackName, s.image, s.price, s.promotion, s.content, s.expirationDate
+    let sql = `SELECT p.*, u.username, u.email, s.servicePackName, s.image, s.price, s.promotion, s.content, s.expirationDate
                                       FROM ${constant.TABLE_DATABASE.PRODUCT} AS p
-                                         LEFT JOIN ${constant.TABLE_DATABASE.SERVICE_PACK} AS s
-                                                   ON s.servicePackID = p.servicePackID
-                                                  WHERE p.userID = '${payload.userID}'`;
-    if (payload.status) {
-      sql += p.status = `and ${payload.status}`;
+                                        LEFT JOIN ${constant.TABLE_DATABASE.SERVICE_PACK} AS s
+                                                  ON s.servicePackID = p.servicePackID
+                                        LEFT JOIN ${constant.TABLE_DATABASE.USER} AS u
+                                                  ON u.userID = p.userID`;
+
+    const conditions = [];
+    const params = [];
+
+    if (!isEmpty(payload.userID)) {
+      conditions.push('p.userID = ?');
+      params.push(payload.userID);
     }
 
+    if (!isEmpty(payload.status)) {
+      conditions.push('p.status = ?');
+      params.push(payload.status);
+    }
+
+    if (conditions.length > 0) {
+      sql +=
+        ' WHERE ' + conditions.join(' AND ') + ' ORDER BY p.updatedAt DESC';
+    }
     try {
-      let productDB = await querySQl(sql);
+      let productDB = await querySQl(sql, params);
       return res.status(constant.SYSTEM_HTTP_STATUS.OK).json({
         status: constant.SYSTEM_HTTP_STATUS.OK,
         data: productDB,
