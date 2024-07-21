@@ -53,7 +53,7 @@ const notificationService = {
           await sendEmail(
             user.email,
             process.env.SERVER_NAME,
-            `${payload.text}`
+            `${payload.content}`
           );
         })
       );

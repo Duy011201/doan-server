@@ -64,7 +64,7 @@ const authService = {
       userDB = filterFields(userDB, ['userID', 'email', 'status']);
 
       // assign role, token
-      userDB[0]['roles'] = isEmpty(roles) ? [] : filterFields(roles, ['name']);
+      userDB[0]['role'] = roles[0]['name'];
       userDB[0]['token'] = generateToken(userDB[0]);
 
       return res.status(constant.SYSTEM_HTTP_STATUS.OK).json({
