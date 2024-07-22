@@ -253,10 +253,10 @@ const companyService = {
   },
   svGetAll: async (req, res) => {
     try {
-      let companyDB = await querySQl(`SELECT u.*
-                                FROM ${constant.TABLE_DATABASE.COMPANY} AS u
-                                WHERE u.status = '${constant.SYSTEM_STATUS.ACTIVE}'
-                                   or u.status = '${constant.SYSTEM_STATUS.LOCK}'`);
+      let companyDB = await querySQl(`SELECT c.*
+                                FROM ${constant.TABLE_DATABASE.COMPANY} AS c
+                                WHERE c.status = '${constant.SYSTEM_STATUS.ACTIVE}'
+                                   or c.status = '${constant.SYSTEM_STATUS.LOCK}' ORDER BY c.updatedAt DESC`);
       return res.status(constant.SYSTEM_HTTP_STATUS.OK).json({
         status: constant.SYSTEM_HTTP_STATUS.OK,
         data: companyDB,

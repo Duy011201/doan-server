@@ -339,7 +339,7 @@ const authService = {
                                          LEFT JOIN ${constant.TABLE_DATABASE.ROLE} AS r
                                                    ON ur.roleID = r.roleID
                                 WHERE u.status = '${constant.SYSTEM_STATUS.ACTIVE}'
-                                   or u.status = '${constant.SYSTEM_STATUS.LOCK}'`);
+                                   or u.status = '${constant.SYSTEM_STATUS.LOCK}' ORDER BY u.updatedAt DESC`);
       return res.status(constant.SYSTEM_HTTP_STATUS.OK).json({
         status: constant.SYSTEM_HTTP_STATUS.OK,
         data: userDB,

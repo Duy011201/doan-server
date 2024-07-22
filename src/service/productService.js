@@ -291,8 +291,8 @@ const productService = {
                                         LEFT JOIN ${constant.TABLE_DATABASE.USER} AS u
                                                   ON u.userID = p.userID`;
 
-    const conditions = [];
-    const params = [];
+    let conditions = [];
+    let params = [];
 
     if (!isEmpty(payload.userID)) {
       conditions.push('p.userID = ?');
@@ -305,9 +305,9 @@ const productService = {
     }
 
     if (conditions.length > 0) {
-      sql +=
-        ' WHERE ' + conditions.join(' AND ') + ' ORDER BY p.updatedAt DESC';
+      sql += ' WHERE ' + conditions.join(' AND ');
     }
+    sql += ' ORDER BY p.updatedAt DESC';
     try {
       let productDB = await querySQl(sql, params);
       return res.status(constant.SYSTEM_HTTP_STATUS.OK).json({

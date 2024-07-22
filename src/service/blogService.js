@@ -171,6 +171,7 @@ const blogService = {
     const payload = req.body;
     const schema = Joi.object({
       blogID: Joi.string().required(),
+      updatedBy: Joi.string().required(),
       status: Joi.string().required(),
       token: Joi.string().required(),
     });
@@ -186,14 +187,15 @@ const blogService = {
     try {
       await querySQl(
         `UPDATE ${constant.TABLE_DATABASE.BLOG} as b
-                            SET b.status = ?
+                            SET b.status = ?,
+                            b.updatedBy = ?
                             WHERE b.blogID = ?`,
-        [payload.status, payload.blogID]
+        [payload.status, payload.updatedBy, payload.blogID]
       );
 
       return res.status(constant.SYSTEM_HTTP_STATUS.OK).json({
         status: constant.SYSTEM_HTTP_STATUS.OK,
-        message: constant.RESPONSE_MESSAGE.SUCCESS_LOCK,
+        message: constant.RESPONSE_MESSAGE.SUCCESS_UPDATE,
       });
     } catch (err) {
       console.error('Error executing query status blog by id :', err.stack);
@@ -207,13 +209,47 @@ const blogService = {
   },
   svGetAll: async (req, res) => {
     try {
-      let blogDB = await querySQl(`SELECT b.*, u.username, u.email
+      const payload = req.body;
+      const schema = Joi.object({
+        userID: Joi.string().allow(''),
+        status: Joi.string().allow(''),
+        token: Joi.string().required(),
+      });
+
+      const { error } = schema.validate(payload);
+      if (error) {
+        return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST).json({
+          status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
+          massage: error.details[0].message,
+        });
+      }
+      let sql = `SELECT b.*, u.username, u.email
                                 FROM ${constant.TABLE_DATABASE.BLOG} AS b
                                          LEFT JOIN ${constant.TABLE_DATABASE.USER} AS u
-                                                   ON u.userID = b.createdBy`);
+                                                   ON u.userID = b.createdBy`;
+
+      let conditions = [];
+      let params = [];
+
+      if (payload && typeof payload === 'object') {
+        if (!isEmpty(payload.userID)) {
+          conditions.push('b.createdBy = ?');
+          params.push(payload.userID);
+        }
+
+        if (!isEmpty(payload.status)) {
+          conditions.push('b.status = ?');
+          params.push(payload.status);
+        }
+      }
+
+      if (conditions.length > 0) {
+        sql += ' WHERE ' + conditions.join(' AND ');
+      }
+      sql += ' ORDER BY b.updatedAt DESC';
       return res.status(constant.SYSTEM_HTTP_STATUS.OK).json({
         status: constant.SYSTEM_HTTP_STATUS.OK,
-        data: blogDB,
+        data: await querySQl(sql, params),
       });
     } catch (err) {
       console.error('Error executing query get all blog :', err.stack);
