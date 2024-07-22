@@ -277,12 +277,12 @@ const recruitmentService = {
       let params = [];
 
       if (!isEmpty(payload.userID)) {
-        conditions.push('p.userID = ?');
+        conditions.push('r.userID = ?');
         params.push(payload.userID);
       }
 
       if (!isEmpty(payload.status)) {
-        conditions.push('p.status = ?');
+        conditions.push('r.status = ?');
         params.push(payload.status);
       }
 
