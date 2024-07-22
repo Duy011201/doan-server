@@ -10,6 +10,7 @@ const constant = {
     SERVICE_PACK: 'service_pack',
     PRODUCT: 'product',
     HISTORY: 'history',
+    RECRUITMENT: 'recruitment',
   },
   SYSTEM_HTTP_STATUS: {
     OK: 200,
@@ -65,6 +66,17 @@ const constant = {
     DELETE: 'DELETE',
     INSERT: 'INSERT',
     UPDATE: 'UPDATE',
+  },
+  RECRUITMENT: {
+    PENDING: 'PENDING',
+    APPROVED: 'APPROVED',
+    PUBLISHED: 'PUBLISHED',
+  },
+  RECRUITMENT_PROCESS: {
+    CANDIDATE_APPLY: 'CANDIDATE_APPLY',
+    CANDIDATE_INTERVIEW: 'CANDIDATE_INTERVIEW',
+    CANDIDATE_OFFER: 'CANDIDATE_OFFER',
+    CANDIDATE_HIRED: 'CANDIDATE_HIRED',
   },
   RESPONSE_MESSAGE: {
     SUCCESS_REGISTER_ACCOUNT: 'Đăng ký tài khoản thành công',

@@ -135,6 +135,42 @@ create table history (
     foreign key (productID) REFERENCES product(productID)
 );
 
+create table recruitment (
+    recruitmentID varchar(36) not null primary key,
+    userID varchar(36) not null,
+    status enum ('PENDING', 'APPROVED', 'PUBLISHED') default 'PENDING' not null,
+    title varchar(255) not null,
+    keyword varchar(255) not null,
+    address varchar(255) not null,
+    description longtext not null,
+    required longtext not null,
+    province varchar(255) null,
+    field varchar(255) null,
+    salaryFrom DECIMAL(10, 2) not null default 0,
+    salaryTo DECIMAL(10, 2) not null default 0,
+    createdAt timestamp default CURRENT_TIMESTAMP not null,
+    updatedAt timestamp default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
+    createdBy varchar(36) default 'system' not null,
+    updatedBy varchar(36) default 'system' not null,
+    foreign key (userID) REFERENCES user(userID)
+);
+
+-- create table recruitment_process (
+--     recruitmentProcessID varchar(36) not null primary key,
+--     userID varchar(36) not null,
+--     status enum ('DRAFT', 'PENDING', 'PUBLIC') default 'DRAFT' not null,
+--     title varchar(255) not null,
+--     address varchar(255) not null,
+--     description longtext not null,
+--     required longtext not null,
+--     salaryFrom  DECIMAL(10, 2) not null default 0,
+--     salaryTo  DECIMAL(10, 2) not null default 0,
+--     createdAt timestamp default CURRENT_TIMESTAMP not null,
+--     updatedAt timestamp default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
+--     createdBy varchar(36) default 'system' not null,
+--     updatedBy varchar(36) default 'system' not null,
+--     foreign key (userID) REFERENCES user(userID)
+-- );
 # INSERT DATA
 # Role
 INSERT INTO
