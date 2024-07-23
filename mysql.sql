@@ -90,6 +90,8 @@ create table blog (
     title varchar(255) not null,
     keyword varchar(255) not null,
     content longtext not null,
+    view: int default 0 not null,
+    image varchar(255) not null,
     createdAt timestamp default CURRENT_TIMESTAMP not null,
     updatedAt timestamp default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
     createdBy varchar(36) default 'system' not null,

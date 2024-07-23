@@ -13,6 +13,7 @@ const blogService = {
       title: Joi.string().required(),
       keyword: Joi.string().required(),
       content: Joi.string().required(),
+      image: Joi.string().required(),
       createdBy: Joi.string().required(),
       token: Joi.string().required(),
     });
@@ -40,13 +41,14 @@ const blogService = {
 
       await querySQl(
         `INSERT INTO ${constant.TABLE_DATABASE.BLOG} (blogID, title, keyword, content,
-                                                                         createdBy)
-                            VALUES (?, ?, ?, ?, ?)`,
+                                                                        image ,createdBy)
+                            VALUES (?, ?, ?, ?, ?, ?)`,
         [
           blogID,
           payload.title,
           payload.keyword,
           payload.content,
+          payload.image,
           payload.createdBy,
         ]
       );
@@ -73,6 +75,7 @@ const blogService = {
       keyword: Joi.string().required(),
       content: Joi.string().required(),
       status: Joi.string().required(),
+      image: Joi.string().required(),
       updatedBy: Joi.string().required(),
       token: Joi.string().required(),
     });
@@ -103,6 +106,7 @@ const blogService = {
                             SET title     = ?,
                                 keyword   = ?,
                                 content   = ?,
+                                image     = ?,
                                 status    = ?,
                                 updatedBy = ?
                             WHERE blogID = ?`,
@@ -110,6 +114,7 @@ const blogService = {
           payload.title,
           payload.keyword,
           payload.content,
+          payload.image,
           payload.status,
           payload.updatedBy,
           payload.blogID,
@@ -207,12 +212,57 @@ const blogService = {
         });
     }
   },
+  svView: async (req, res) => {
+    const payload = req.body;
+    const schema = Joi.object({
+      blogID: Joi.string().required(),
+      token: Joi.string().required(),
+    });
+
+    const { error } = schema.validate(payload);
+    if (error) {
+      return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST).json({
+        status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
+        massage: error.details[0].message,
+      });
+    }
+
+    try {
+      let blogDB = await querySQl(
+        `SELECT *
+                                         FROM ${constant.TABLE_DATABASE.BLOG} as b
+                                         WHERE b.blogID = ?`,
+        [payload.blogID]
+      );
+
+      await querySQl(
+        `UPDATE ${constant.TABLE_DATABASE.BLOG} as b
+                            SET b.view = ?
+                            WHERE b.blogID = ?`,
+        [blogDB[0].view + 1, payload.blogID]
+      );
+
+      return res.status(constant.SYSTEM_HTTP_STATUS.OK).json({
+        status: constant.SYSTEM_HTTP_STATUS.OK,
+        message: constant.RESPONSE_MESSAGE.SUCCESS_UPDATE,
+      });
+    } catch (err) {
+      console.error('Error executing query status blog by id :', err.stack);
+      return res
+        .status(constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR)
+        .json({
+          status: constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR,
+          message: constant.SYSTEM_HTTP_MESSAGE.INTERNAL_SERVER_ERROR,
+        });
+    }
+  },
   svGetAll: async (req, res) => {
     try {
       const payload = req.body;
       const schema = Joi.object({
         userID: Joi.string().allow(''),
         status: Joi.string().allow(''),
+        keyword: Joi.string().allow(''),
         token: Joi.string().required(),
       });
 
@@ -241,6 +291,11 @@ const blogService = {
           conditions.push('b.status = ?');
           params.push(payload.status);
         }
+
+        if (!isEmpty(payload.keyword)) {
+          conditions.push('b.keyword LIKE ?');
+          params.push(`%${payload.keyword}%`);
+        }
       }
 
       if (conditions.length > 0) {
@@ -253,6 +308,36 @@ const blogService = {
       });
     } catch (err) {
       console.error('Error executing query get all blog :', err.stack);
+      return res
+        .status(constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR)
+        .json({
+          status: constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR,
+          message: constant.SYSTEM_HTTP_MESSAGE.INTERNAL_SERVER_ERROR,
+        });
+    }
+  },
+  svGetByID: async (req, res) => {
+    try {
+      const payload = req.body;
+      const schema = Joi.object({
+        blogID: Joi.string().required(),
+        token: Joi.string().required(),
+      });
+
+      const { error } = schema.validate(payload);
+      if (error) {
+        return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST).json({
+          status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
+          massage: error.details[0].message,
+        });
+      }
+      let sql = `SELECT * FROM ${constant.TABLE_DATABASE.BLOG} AS b WHERE b.blogID = '${payload.blogID}'`;
+      return res.status(constant.SYSTEM_HTTP_STATUS.OK).json({
+        status: constant.SYSTEM_HTTP_STATUS.OK,
+        data: await querySQl(sql),
+      });
+    } catch (err) {
+      console.error('Error executing query get by id blog :', err.stack);
       return res
         .status(constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR)
         .json({

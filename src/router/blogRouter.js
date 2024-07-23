@@ -7,5 +7,7 @@ router.post('/update', blogController.update);
 router.post('/delete', blogController.delete);
 router.post('/get-all', blogController.getAll);
 router.post('/status', blogController.status);
+router.post('/view', blogController.view);
+router.post('/get-by-id', blogController.getByID);
 
 module.exports = router;

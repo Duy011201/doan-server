@@ -16,6 +16,12 @@ const blogController = {
   status: (req, res) => {
     return blogService.svStatus(req, res);
   },
+  view: (req, res) => {
+    return blogService.svView(req, res);
+  },
+  getByID: (req, res) => {
+    return blogService.svGetByID(req, res);
+  },
 };
 
 module.exports = blogController;
