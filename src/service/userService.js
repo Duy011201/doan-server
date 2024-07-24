@@ -19,6 +19,7 @@ const authService = {
       email: Joi.string().email().required(),
       phone: Joi.string().allow(''),
       avatar: Joi.string().allow(''),
+      profile: Joi.string().allow(''),
       createdBy: Joi.string().required(),
       token: Joi.string().required(),
     });
@@ -66,9 +67,9 @@ const authService = {
           `INSERT INTO ${constant.TABLE_DATABASE.USER} (userID, companyID, username, email,
                                                                              password,
                                                                              phone, avatar, status, language,
-                                                                             certificate,
+                                                                             certificate, profile,
                                                                              education, createdBy)
-                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
             userID,
             payload.companyID,
@@ -80,6 +81,7 @@ const authService = {
             constant.SYSTEM_STATUS.ACTIVE,
             payload.language,
             payload.certificate,
+            payload.profile,
             payload.education,
             payload.createdBy,
           ]
@@ -88,7 +90,7 @@ const authService = {
         await querySQl(
           `INSERT INTO ${constant.TABLE_DATABASE.USER} (userID, username, email, password,
                                                                              phone, avatar, status, language,
-                                                                             certificate,
+                                                                             certificate, profile,
                                                                              education, createdBy)
                                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
@@ -101,6 +103,7 @@ const authService = {
             constant.SYSTEM_STATUS.ACTIVE,
             payload.language,
             payload.certificate,
+            payload.profile,
             payload.education,
             payload.createdBy,
           ]
@@ -144,6 +147,7 @@ const authService = {
       email: Joi.string().email().required(),
       phone: Joi.string().allow(''),
       avatar: Joi.string().allow(''),
+      profile: Joi.string().allow(''),
       updatedBy: Joi.string().required(),
       companyID: Joi.string().allow(''),
       language: Joi.string().allow(''),
@@ -214,6 +218,7 @@ const authService = {
                                 status      = ?,
                                 language    = ?,
                                 certificate = ?,
+                                profile      = ?,
                                 education   = ?,
                                 updatedBy   = ?
                             WHERE userID = ?`,
@@ -226,6 +231,7 @@ const authService = {
           payload.status,
           payload.language,
           payload.certificate,
+          payload.profile,
           payload.education,
           payload.updatedBy,
           payload.userID,

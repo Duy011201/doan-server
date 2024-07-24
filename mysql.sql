@@ -37,6 +37,7 @@ create table user (
     password varchar(100) not null,
     phone varchar(20) null,
     avatar varchar(255) null,
+    profile varchar(255) not null,
     status enum ('ACTIVE', 'IN_ACTIVE', 'LOCK') default 'ACTIVE' not null,
     language varchar(50) null,
     certificate varchar(100) null,
@@ -148,6 +149,7 @@ create table recruitment (
     required longtext not null,
     province varchar(255) null,
     field varchar(255) null,
+    timeExpiration DECIMAL(10, 2) not null default 0,
     salaryFrom DECIMAL(10, 2) not null default 0,
     salaryTo DECIMAL(10, 2) not null default 0,
     createdAt timestamp default CURRENT_TIMESTAMP not null,
@@ -157,22 +159,18 @@ create table recruitment (
     foreign key (userID) REFERENCES user(userID)
 );
 
--- create table recruitment_process (
---     recruitmentProcessID varchar(36) not null primary key,
---     userID varchar(36) not null,
---     status enum ('DRAFT', 'PENDING', 'PUBLIC') default 'DRAFT' not null,
---     title varchar(255) not null,
---     address varchar(255) not null,
---     description longtext not null,
---     required longtext not null,
---     salaryFrom  DECIMAL(10, 2) not null default 0,
---     salaryTo  DECIMAL(10, 2) not null default 0,
---     createdAt timestamp default CURRENT_TIMESTAMP not null,
---     updatedAt timestamp default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
---     createdBy varchar(36) default 'system' not null,
---     updatedBy varchar(36) default 'system' not null,
---     foreign key (userID) REFERENCES user(userID)
--- );
+create table recruitment_process (
+    recruitmentProcessID varchar(36) not null primary key,
+    userID varchar(36) not null,
+    candidateID varchar(36) not null,
+    status enum ('REVIEW', 'INTERVIEW', 'OFFER') default 'REVIEW' not null,
+    createdAt timestamp default CURRENT_TIMESTAMP not null,
+    updatedAt timestamp default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
+    createdBy varchar(36) default 'system' not null,
+    updatedBy varchar(36) default 'system' not null,
+    foreign key (userID) REFERENCES user(userID)
+);
+
 # INSERT DATA
 # Role
 INSERT INTO

@@ -18,6 +18,7 @@ const recruitmentService = {
       required: Joi.string().required(),
       province: Joi.string().required(),
       field: Joi.string().required(),
+      timeExpiration: Joi.number().required(),
       salaryFrom: Joi.number().required().min(0),
       salaryTo: Joi.number().required().min(0),
       createdBy: Joi.string().required(),
@@ -47,9 +48,9 @@ const recruitmentService = {
 
       await querySQl(
         `INSERT INTO ${constant.TABLE_DATABASE.RECRUITMENT} (recruitmentID, userID, status, keyword, title,
-                                                                         address, description, required,
+                                                                         address, description, required, timeExpiration,
                                                                          province, field, salaryFrom, salaryTo, createdBy)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           recruitmentID,
           payload.userID,
@@ -59,6 +60,7 @@ const recruitmentService = {
           payload.address,
           payload.description,
           payload.required,
+          payload.timeExpiration,
           payload.province,
           payload.field,
           payload.salaryFrom,
@@ -93,6 +95,7 @@ const recruitmentService = {
       required: Joi.string().required(),
       province: Joi.string().required(),
       field: Joi.string().required(),
+      timeExpiration: Joi.number().required(),
       salaryFrom: Joi.number().required().min(0),
       salaryTo: Joi.number().required().min(0),
       salaryFrom: Joi.number().required().min(0),
@@ -133,6 +136,7 @@ const recruitmentService = {
                                 required   = ?,
                                 province = ?,
                                 field = ?,
+                                timeExpiration = ?,
                                 salaryFrom   = ?,
                                 salaryTo   = ?,
                                 status    = ?,
@@ -147,6 +151,7 @@ const recruitmentService = {
           payload.required,
           payload.province,
           payload.field,
+          payload.timeExpiration,
           payload.salaryFrom,
           payload.salaryTo,
           payload.status,
