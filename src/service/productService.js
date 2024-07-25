@@ -111,8 +111,8 @@ const productService = {
       let productDB = await querySQl(
         `SELECT *
                                          FROM ${constant.TABLE_DATABASE.PRODUCT} as p
-                                         ORDER BY totalExpiration DESC`,
-        []
+                                         WHERE p.productID = ?`,
+        [payload.productID]
       );
       if (isEmpty(productDB)) {
         return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST).json({
@@ -124,15 +124,11 @@ const productService = {
         `SELECT *
                                          FROM ${constant.TABLE_DATABASE.PRODUCT} as p
                                          WHERE p.servicePackID = ? AND p.status = ? AND p.productID <> ?`,
-        [
-          payload.servicePackID,
-          constant.PRODUCT_STATUS.PENDING,
-          payload.productID,
-        ]
+        [payload.servicePackID, constant.PRODUCT_STATUS.PAID, payload.productID]
       );
 
       if (
-        servicePackInProductDB.length > 0 &&
+        servicePackInProductDB.length >= 0 &&
         payload.status === constant.PRODUCT_STATUS.PAID
       ) {
         let servicePackDB = await querySQl(
@@ -141,20 +137,14 @@ const productService = {
                                            WHERE s.servicePackID = ?`,
           [payload.servicePackID]
         );
-        let productDB = await querySQl(
-          `SELECT *
-                                           FROM ${constant.TABLE_DATABASE.PRODUCT} as p
-                                           WHERE p.productID = ?`,
-          [payload.productID]
-        );
 
-        if (productDB[0].totalExpiration === 0) {
+        if (servicePackInProductDB.length === 0) {
           await querySQl(
             `UPDATE ${constant.TABLE_DATABASE.PRODUCT}
-                                SET status = ?,
-                                    totalExpiration = ?,
-                                    updatedBy = ?
-                                WHERE productID = ?`,
+                                  SET status = ?,
+                                      totalExpiration = ?,
+                                      updatedBy = ?
+                                  WHERE productID = ?`,
             [
               payload.status,
               Number(productDB[0].totalExpiration) +
@@ -168,34 +158,24 @@ const productService = {
             `UPDATE ${constant.TABLE_DATABASE.PRODUCT}
                                 SET status = ?,
                                     totalExpiration = ?,
-                                    updatedAt = ?
+                                    updatedBy = ?
                                 WHERE productID = ?`,
             [
               payload.status,
               Number(productDB[0].totalExpiration) +
-                Number(servicePackDB[0].expirationDate),
-              productDB[0].updatedAt,
+                Number(servicePackDB[0].expirationDate) +
+                Number(servicePackInProductDB[0].totalExpiration),
+              payload.updatedBy,
               productDB[0].productID,
             ]
           );
-        }
 
-        await querySQl(
-          `DELETE FROM ${constant.TABLE_DATABASE.PRODUCT} as p
+          await querySQl(
+            `DELETE FROM ${constant.TABLE_DATABASE.PRODUCT} as p
                               WHERE p.productID = ?`,
-          [servicePackInProductDB[0].productID]
-        );
-
-        await querySQl(
-          `INSERT INTO ${constant.TABLE_DATABASE.HISTORY} (historyID, servicePackID, status, createdBy)
-                                VALUES (?, ?, ?, ?)`,
-          [
-            historyID,
-            payload.servicePackID,
-            constant.PRODUCT_STATUS.PAID,
-            payload.updatedBy,
-          ]
-        );
+            [servicePackInProductDB[0].productID]
+          );
+        }
       } else {
         await querySQl(
           `UPDATE ${constant.TABLE_DATABASE.PRODUCT}
@@ -206,12 +186,26 @@ const productService = {
         );
       }
 
+      if (payload.status === constant.PRODUCT_STATUS.PAID) {
+        await querySQl(
+          `INSERT INTO ${constant.TABLE_DATABASE.HISTORY} (historyID, servicePackID, status, createdBy, updatedBy)
+                                VALUES (?, ?, ?, ?, ?)`,
+          [
+            historyID,
+            payload.servicePackID,
+            constant.PRODUCT_STATUS.PAID,
+            productDB[0].createdBy,
+            payload.updatedBy,
+          ]
+        );
+      }
+
       return res.status(constant.SYSTEM_HTTP_STATUS.OK).json({
         status: constant.SYSTEM_HTTP_STATUS.OK,
         message: constant.RESPONSE_MESSAGE.SUCCESS_UPDATE,
       });
     } catch (err) {
-      console.error('Error executing query update service pack :', err.stack);
+      console.error('Error executing query update product:', err.stack);
       return res
         .status(constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR)
         .json({
