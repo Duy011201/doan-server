@@ -37,7 +37,7 @@ const servicePackService = {
       );
       if (!isEmpty(serviceDB)) {
         return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST).json({
-          message: constant.RESPONSE_MESSAGE.ERROR_SERVICE_PACK_NAME,
+          message: constant.RESPONSE_MESSAGE.ERROR_SERVICE_PACK_NAME_EXIT,
         });
       }
 
