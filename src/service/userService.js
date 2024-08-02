@@ -2,7 +2,11 @@ const constant = require('../config/constant');
 const { querySQl } = require('../core/repository');
 const Joi = require('joi');
 const { v4: uuidv4 } = require('uuid');
-const { isEmpty, bcryptHashPassword } = require('../core/func');
+const {
+  isEmpty,
+  bcryptHashPassword,
+  bcryptComparePassword,
+} = require('../core/func');
 
 const authService = {
   svCreate: async (req, res) => {
@@ -360,7 +364,6 @@ const authService = {
         });
     }
   },
-
   svResetPassword: async (req, res) => {
     const payload = req.body;
     const schema = Joi.object({
@@ -394,6 +397,68 @@ const authService = {
     } catch (err) {
       console.error(
         'Error executing query reset password user by id :',
+        err.stack
+      );
+      return res
+        .status(constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR)
+        .json({
+          status: constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR,
+          message: constant.SYSTEM_HTTP_MESSAGE.INTERNAL_SERVER_ERROR,
+        });
+    }
+  },
+  svChangePassword: async (req, res) => {
+    const payload = req.body;
+    const schema = Joi.object({
+      userID: Joi.string().required(),
+      oldPassword: Joi.string().required(),
+      newPassword: Joi.string().required(),
+      token: Joi.string().required(),
+    });
+
+    const { error } = schema.validate(payload);
+    if (error) {
+      return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST).json({
+        status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
+        massage: error.details[0].message,
+      });
+    }
+
+    try {
+      let userDB = await querySQl(
+        `SELECT *
+                                         FROM ${constant.TABLE_DATABASE.USER} as u
+                                         WHERE u.userID = ?`,
+        [payload.userID]
+      );
+      if (
+        isEmpty(userDB) ||
+        !(await bcryptComparePassword(
+          payload.oldPassword,
+          userDB[0][`password`]
+        ))
+      )
+        return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST).json({
+          status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
+          message: constant.RESPONSE_MESSAGE.INCORRECT_PASSWORD,
+        });
+
+      const hashPassword = await bcryptHashPassword(payload.newPassword);
+
+      await querySQl(
+        `UPDATE ${constant.TABLE_DATABASE.USER} as u
+                            SET u.password = ?
+                            WHERE u.userID = ?`,
+        [hashPassword, payload.userID]
+      );
+
+      return res.status(constant.SYSTEM_HTTP_STATUS.OK).json({
+        status: constant.SYSTEM_HTTP_STATUS.OK,
+        message: constant.RESPONSE_MESSAGE.SUCCESS_RESET_PASSWORD,
+      });
+    } catch (err) {
+      console.error(
+        'Error executing query change password user by id :',
         err.stack
       );
       return res

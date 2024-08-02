@@ -92,6 +92,7 @@ const constant = {
     SUCCESS_SEND_EMAIL: 'Gửi email thành công',
 
     INCORRECT_EMAIL_OR_PASSWORD: 'Tài khoản hoặc mật khẩu không chính xác',
+    INCORRECT_PASSWORD: 'Mật khẩu không chính xác',
     INVALID_EMAIL_FORMAT: 'Định dạng email không hợp lệ',
     INVALID_PASSWORD_FORMAT: 'Định dạng passwword không hợp lệ',
     INVALID_TOKEN: 'Định dạng token không hợp lệ',
@@ -117,7 +118,7 @@ const constant = {
     ERROR_ROLE: 'Lỗi quyền',
     ERROR_UPLOAD_FILE: 'Lỗi upload file',
     ERROR_NOT_FOUND_FILE: 'Lỗi không tìm thấy file',
-    ERROR_SERVICE_PACK_NAME: 'Lỗi tên gói dịch vụ',
+    ERROR_SERVICE_PACK_NAME_EXIT: 'Lỗi tên gói dịch vụ đã tồn tại',
     ERROR_PRODUCT_EXIT: 'Lỗi sản phẩm đã tồn tại',
     ERROR_PRODUCT_NOT_FOUND: 'Lỗi sản phẩm không tồn tại',
     ERROR_NOT_FOUND_SERVICE_PACK: 'Lỗi không tìm thấy gói dịch vụ',

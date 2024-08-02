@@ -8,5 +8,6 @@ router.post('/delete', userController.delete);
 router.post('/get-all', userController.getAll);
 router.post('/reset-password', userController.resetPassword);
 router.post('/lock', userController.lock);
+router.post('/change-password', userController.changePassword);
 
 module.exports = router;
