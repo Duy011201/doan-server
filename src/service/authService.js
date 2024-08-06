@@ -117,9 +117,6 @@ const authService = {
           status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
           message: constant.RESPONSE_MESSAGE.ERROR_EMAIL_ALREADY_EXIT,
         });
-
-      console.log(userDB);
-
       const verifyCodeDB = await querySQl(
         `SELECT *
                                                  FROM ${constant.TABLE_DATABASE.VERIFY_CODE} as v
@@ -130,7 +127,7 @@ const authService = {
       if (
         isEmpty(verifyCodeDB) ||
         !verifyCodeDB[0]['code'] === payload.verifyCode ||
-        !timeDiff(today, verifyCodeDB[0]['createdAt'], 1)
+        !timeDiff(today, verifyCodeDB[0]['updatedAt'], 1)
       ) {
         return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST).json({
           status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
@@ -272,7 +269,7 @@ const authService = {
       }
 
       await sendEmail(
-        process.env.SERVER_EMAIL_ADDRESS_TEST,
+        payload.email,
         process.env.SERVER_NAME,
         `Mã xác thực của bạn là: ${verifyCode}`
       );
