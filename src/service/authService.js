@@ -269,7 +269,7 @@ const authService = {
       }
 
       await sendEmail(
-        payload.email,
+          process.env.SERVER_EMAIL_ADDRESS_TEST,
         process.env.SERVER_NAME,
         `Mã xác thực của bạn là: ${verifyCode}`
       );
