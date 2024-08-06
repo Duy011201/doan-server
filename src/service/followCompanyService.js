@@ -118,7 +118,10 @@ const followCompanyService = {
                     massage: error.details[0].message,
                 });
             }
-            let flowCompanyDB = await querySQl(`SELECT f.followCompanyID, u.companyID, c.name as companyName, c.logo as companyLogo,
+            let flowCompanyDB = await querySQl(`SELECT f.followCompanyID,
+                                                       u.companyID,
+                                                       c.name                 as companyName,
+                                                       c.logo                 as companyLogo,
                                                        COUNT(r.recruitmentID) AS recruitmentCount
                                                 FROM ${constant.TABLE_DATABASE.FOLLOW_COMPANY} AS f
                                                          LEFT JOIN ${constant.TABLE_DATABASE.USER} AS u
@@ -127,7 +130,10 @@ const followCompanyService = {
                                                                    ON c.companyID = f.companyID
                                                          LEFT JOIN ${constant.TABLE_DATABASE.RECRUITMENT} AS r
                                                                    ON r.userID = f.userID
-                                                WHERE f.userID = ? AND r.status = '${constant.RECRUITMENT.PUBLISHED}'
+                                                WHERE f.userID = ?
+                                                  AND u.status = '${constant.SYSTEM_STATUS.ACTIVE}'
+                                                  AND c.status = '${constant.SYSTEM_STATUS.ACTIVE}'
+                                                  AND r.status = '${constant.RECRUITMENT.PUBLISHED}'
                                                 GROUP BY f.followCompanyID, f.userID, u.companyID, c.name, c.logo`, [payload.userID]);
             return res.status(constant.SYSTEM_HTTP_STATUS.OK).json({
                 status: constant.SYSTEM_HTTP_STATUS.OK,
