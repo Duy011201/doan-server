@@ -11,6 +11,8 @@ const constant = {
     PRODUCT: 'product',
     HISTORY: 'history',
     RECRUITMENT: 'recruitment',
+    RECRUITMENT_PROCESS: 'recruitment_process',
+    FOLLOW_COMPANY: 'follow_company',
   },
   SYSTEM_HTTP_STATUS: {
     OK: 200,
@@ -112,6 +114,8 @@ const constant = {
     ERROR_EMAIL_ALREADY_EXIT: 'Lỗi email đã tồn tại',
     ERROR_CORPORATE_TAX_CODE_ALREADY_EXIT: 'Lỗi mã số thuế đã tồn tại',
     ERROR_KEYWORD_EXIT: 'Lỗi keyword đã tồn tại',
+    ERROR_RECRUITMENT_EXIT: 'Lỗi tin tuyển dụng đã tồn tại',
+    ERROR_COMPANY_EXIT: 'Lỗi công ty đã tồn tại',
     ERROR_USER_NOT_EXIT: 'Lỗi người dùng không tồn tại',
     ERROR_COMPANY_NOT_EXIT: 'Lỗi công ty không tồn tại',
     ERROR_ENCODE: 'Lỗi mã hóa mật khẩu',

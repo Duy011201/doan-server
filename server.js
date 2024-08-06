@@ -19,6 +19,8 @@ const routerService = require('./src/router/serviceRouter');
 const routerProduct = require('./src/router/productRouter');
 const routerHistory = require('./src/router/historyRouter');
 const routerRecruitment = require('./src/router/recruitmentRouter');
+const routerRecruitmentProcess = require('./src/router/recruitmentProcessRouter');
+const routerFollowCompany = require('./src/router/followCompanyRouter');
 
 require('dotenv').config();
 
@@ -59,6 +61,8 @@ app.use('/api/service-pack', routerService);
 app.use('/api/product', routerProduct);
 app.use('/api/history', routerHistory);
 app.use('/api/recruitment', routerRecruitment);
+app.use('/api/recruitment-process', routerRecruitmentProcess);
+app.use('/api/follow-company', routerFollowCompany);
 
 app.listen(port, () => {
   console.log(`Server is listening on port ${port}`);
