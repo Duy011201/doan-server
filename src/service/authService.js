@@ -61,7 +61,7 @@ const authService = {
                                         WHERE ur.userID = ?`,
         [userDB[0]['userID']]
       );
-      userDB = filterFields(userDB, ['userID', 'email', 'status']);
+      userDB = filterFields(userDB, ['userID', 'email', 'status', 'avatar']);
 
       // assign role, token
       userDB[0]['role'] = roles[0]['name'];
