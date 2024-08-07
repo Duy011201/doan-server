@@ -102,12 +102,54 @@ const recruitmentProcessService = {
                 });
         }
     },
+    svSaveProfile: async (req, res) => {
+        const payload = req.body;
+        const schema = Joi.object({
+            recruitmentProcessID: Joi.string().required(),
+            saveProfile: Joi.string().required(),
+            token: Joi.string().required(),
+        });
+
+        const {error} = schema.validate(payload);
+        if (error) {
+            return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST).json({
+                status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
+                massage: error.details[0].message,
+            });
+        }
+
+        try {
+            await querySQl(
+                `UPDATE ${constant.TABLE_DATABASE.RECRUITMENT_PROCESS} as rp
+                 SET rp.saveProfile = ?
+                 WHERE rp.recruitmentProcessID = ?`,
+                [payload.saveProfile, payload.recruitmentProcessID]
+            );
+
+            return res.status(constant.SYSTEM_HTTP_STATUS.OK).json({
+                status: constant.SYSTEM_HTTP_STATUS.OK,
+                message: constant.RESPONSE_MESSAGE.SUCCESS_DELETE,
+            });
+        } catch (err) {
+            console.error(
+                'Error executing query save profile recruitment process by id :',
+                err.stack
+            );
+            return res
+                .status(constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR)
+                .json({
+                    status: constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                    message: constant.SYSTEM_HTTP_MESSAGE.INTERNAL_SERVER_ERROR,
+                });
+        }
+    },
     svGetAllEmployer: async (req, res) => {
         try {
             const payload = req.body;
             const schema = Joi.object({
                 recruitmentID: Joi.string().allow(''),
                 userID: Joi.string().allow(''),
+                saveProfile: Joi.string().allow(''),
                 token: Joi.string().required(),
             });
 
@@ -118,7 +160,7 @@ const recruitmentProcessService = {
                     massage: error.details[0].message,
                 });
             }
-            let sql = `SELECT rp.recruitmentProcessID, rp.createdAt, r.recruitmentID, r.userID, r.title, u.email , u.profile, u.avatar
+            let sql = `SELECT rp.recruitmentProcessID, rp.saveProfile, rp.createdAt, r.recruitmentID, r.userID, r.title, u.email , u.profile, u.avatar
                        FROM ${constant.TABLE_DATABASE.RECRUITMENT_PROCESS} AS rp
                                 LEFT JOIN ${constant.TABLE_DATABASE.RECRUITMENT} AS r
                                           ON r.recruitmentID = rp.recruitmentID
@@ -139,6 +181,11 @@ const recruitmentProcessService = {
 
                 conditions.push('r.status = ?');
                 params.push(constant.RECRUITMENT.PUBLISHED);
+            }
+
+            if (!isEmpty(payload.saveProfile)) {
+                conditions.push('rp.saveProfile = ?');
+                params.push(payload.saveProfile);
             }
 
             if (conditions.length > 0) {

@@ -13,6 +13,9 @@ const recruitmentProcessController = {
     delete: (req, res) => {
         return recruitmentProcessService.svDelete(req, res);
     },
+    saveProfile: (req, res) => {
+        return recruitmentProcessService.svSaveProfile(req, res);
+    },
 };
 
 module.exports = recruitmentProcessController;
