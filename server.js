@@ -36,9 +36,6 @@ app.use(cors({ origin: process.env.CLIENT_URL }));
 // }));
 app.use(logger('dev'));
 app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-app.use('/api/store', uploadRole);
 
 app.use(bodyParser.json({ limit: '100mb' }));
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -50,6 +47,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 // app.use(middlewareAuth);
 
 connectDB.connect();
+
+// TODO over to middleware auth
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/api/store', uploadRole);
 
 app.use('/api/auth', routerAuth);
 app.use('/api/admin/user', routerUser);

@@ -7,6 +7,9 @@ const roleController = {
   getFile: (req, res) => {
     return storeService.svGetFile(req, res);
   },
+  getManyFile: (req, res) => {
+    return storeService.svGetManyFile(req, res);
+  },
 };
 
 module.exports = roleController;

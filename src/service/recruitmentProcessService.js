@@ -28,8 +28,8 @@ const recruitmentProcessService = {
             let recruitmentDB = await querySQl(
                 `SELECT *
                  FROM ${constant.TABLE_DATABASE.RECRUITMENT_PROCESS} as r
-                 WHERE r.recruitmentID = ?`,
-                [payload.recruitmentID]
+                 WHERE r.recruitmentID = ? AND r.candidateID = ?`,
+                [payload.recruitmentID, payload.candidateID]
             );
             if (!isEmpty(recruitmentDB)) {
                 return res
@@ -118,7 +118,7 @@ const recruitmentProcessService = {
                     massage: error.details[0].message,
                 });
             }
-            let sql = `SELECT rp.recruitmentProcessID, r.recruitmentID, r.userID, r.title, u.email , u.profile, u.avatar
+            let sql = `SELECT rp.recruitmentProcessID, rp.createdAt, r.recruitmentID, r.userID, r.title, u.email , u.profile, u.avatar
                        FROM ${constant.TABLE_DATABASE.RECRUITMENT_PROCESS} AS rp
                                 LEFT JOIN ${constant.TABLE_DATABASE.RECRUITMENT} AS r
                                           ON r.recruitmentID = rp.recruitmentID

@@ -6,6 +6,7 @@
     "lint": "eslint --fix --config eslint.config.js \"src/**/*.{ts,tsx,js,jsx}\""
   },
   "dependencies": {
+    "archiver": "^7.0.1",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
