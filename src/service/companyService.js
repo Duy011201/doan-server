@@ -273,6 +273,41 @@ const companyService = {
                 });
         }
     },
+    svGetByID: async (req, res) => {
+        const payload = req.body;
+        const schema = Joi.object({
+            companyID: Joi.string().required(),
+            token: Joi.string().required(),
+        });
+
+        const {error} = schema.validate(payload);
+        if (error) {
+            return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST).json({
+                status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
+                massage: error.details[0].message,
+            });
+        }
+
+        try {
+            let companyDB = await querySQl(`SELECT c.*
+                                            FROM ${constant.TABLE_DATABASE.COMPANY} AS c
+                                            WHERE c.status = '${constant.SYSTEM_STATUS.ACTIVE}'
+                                              AND c.companyID = '${payload.companyID}'
+                                            ORDER BY c.updatedAt DESC`);
+            return res.status(constant.SYSTEM_HTTP_STATUS.OK).json({
+                status: constant.SYSTEM_HTTP_STATUS.OK,
+                data: companyDB,
+            });
+        } catch (err) {
+            console.error('Error executing query get by id company :', err.stack);
+            return res
+                .status(constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR)
+                .json({
+                    status: constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                    message: constant.SYSTEM_HTTP_MESSAGE.INTERNAL_SERVER_ERROR,
+                });
+        }
+    },
     svGetAllHeader: async (req, res) => {
         try {
             let companyDB = await querySQl(`SELECT c.companyID,

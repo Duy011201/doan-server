@@ -10,6 +10,9 @@ const companyController = {
   getAll: (req, res) => {
     return companyService.svGetAll(req, res);
   },
+  getByID: (req, res) => {
+    return companyService.svGetByID(req, res);
+  },
   getAllHeader: (req, res) => {
     return companyService.svGetAllHeader(req, res);
   },

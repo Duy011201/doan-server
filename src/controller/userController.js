@@ -10,6 +10,9 @@ const userController = {
   getAll: (req, res) => {
     return userService.svGetAll(req, res);
   },
+  getByID: (req, res) => {
+    return userService.svGetByID(req, res);
+  },
   delete: (req, res) => {
     return userService.svDelete(req, res);
   },

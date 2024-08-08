@@ -6,6 +6,7 @@ router.post('/create', companyController.create);
 router.post('/update', companyController.update);
 router.post('/delete', companyController.delete);
 router.post('/get-all', companyController.getAll);
+router.post('/get-by-id', companyController.getByID);
 router.post('/get-all-header', companyController.getAllHeader);
 router.post('/lock', companyController.lock);
 
