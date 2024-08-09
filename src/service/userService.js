@@ -339,6 +339,20 @@ const authService = {
         }
     },
     svGetAll: async (req, res) => {
+        const payload = req.body;
+
+        const schema = Joi.object({
+            token: Joi.string().required(),
+        });
+
+        const { error } = schema.validate(payload);
+        if (error) {
+            return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST).json({
+                status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
+                massage: error.details[0].message,
+            });
+        }
+
         try {
             let userDB =
                 await querySQl(`SELECT u.*, r.roleID, r.name as roleName, c.name as companyName

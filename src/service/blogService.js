@@ -216,7 +216,6 @@ const blogService = {
     const payload = req.body;
     const schema = Joi.object({
       blogID: Joi.string().required(),
-      token: Joi.string().required(),
     });
 
     const { error } = schema.validate(payload);
@@ -263,7 +262,6 @@ const blogService = {
         userID: Joi.string().allow(''),
         status: Joi.string().allow(''),
         keyword: Joi.string().allow(''),
-        token: Joi.string().required(),
       });
 
       const { error } = schema.validate(payload);
@@ -321,7 +319,6 @@ const blogService = {
       const payload = req.body;
       const schema = Joi.object({
         blogID: Joi.string().required(),
-        token: Joi.string().required(),
       });
 
       const { error } = schema.validate(payload);

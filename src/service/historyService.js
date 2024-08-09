@@ -1,9 +1,6 @@
 const constant = require('../config/constant');
 const { querySQl } = require('../core/repository');
 const Joi = require('joi');
-const { v4: uuidv4 } = require('uuid');
-const { isEmpty } = require('../core/func');
-const { PRODUCT_STATUS } = require('../config/constant');
 
 const productService = {
   svGetAll: async (req, res) => {

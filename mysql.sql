@@ -112,10 +112,10 @@ create table service_pack
 (
     servicePackID   varchar(36)                           not null primary key,
     servicePackName varchar(255)                          not null,
-    price           DECIMAL(10, 2)                        NOT NULL,
-    promotion       DECIMAL(10, 2)                        NOT NULL,
+    price           INT                               NOT NULL,
+    promotion       TINYINT                               NOT NULL,
     content         longtext                              not null,
-    expirationDate  DECIMAL(10, 2)                        not null,
+    expirationDate  TINYINT                               not null,
     image           varchar(255)                          not null,
     createdAt       timestamp   default CURRENT_TIMESTAMP not null,
     updatedAt       timestamp   default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
@@ -129,7 +129,7 @@ create table product
     servicePackID   varchar(36)                                                 not null,
     userID          varchar(36)                                                 not null,
     status          enum ('DRAFT', 'PENDING', 'PAID') default 'DRAFT'           not null,
-    totalExpiration DECIMAL(10, 2)                                              not null default 0,
+    totalExpiration TINYINT                                                     not null default 0,
     createdAt       timestamp                         default CURRENT_TIMESTAMP not null,
     updatedAt       timestamp                         default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
     createdBy       varchar(36)                       default 'system'          not null,
@@ -165,8 +165,8 @@ create table recruitment
     timeForm      varchar(255)                                                        null,
     timeStart     timestamp                                 default CURRENT_TIMESTAMP not null,
     timeEnd       timestamp                                 default CURRENT_TIMESTAMP not null,
-    salaryFrom    DECIMAL(10, 2)                                                      not null default 0,
-    salaryTo      DECIMAL(10, 2)                                                      not null default 0,
+    salaryFrom    INT                                                             not null default 0,
+    salaryTo      INT                                                             not null default 0,
     createdAt     timestamp                                 default CURRENT_TIMESTAMP not null,
     updatedAt     timestamp                                 default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
     createdBy     varchar(36)                               default 'system'          not null,
@@ -234,272 +234,3 @@ VALUES ('b4f1d09e-34aa-4e38-b24f-9f1c3b7a6d8e',
 
 
 #MSSQL
-
-CREATE TABLE role
-(
-    roleID      VARCHAR(36)                   NOT NULL PRIMARY KEY,
-    name        VARCHAR(255)                  NOT NULL UNIQUE,
-    description TEXT                          NOT NULL,
-    createdAt   DATETIME    DEFAULT GETDATE() NOT NULL,
-    updatedAt   DATETIME    DEFAULT GETDATE() NOT NULL,
-    createdBy   VARCHAR(36) DEFAULT 'system'  NOT NULL,
-    updatedBy   VARCHAR(36) DEFAULT 'system'  NOT NULL
-);
-
-CREATE TABLE company
-(
-    companyID        VARCHAR(36)                   NOT NULL PRIMARY KEY,
-    name             VARCHAR(255)                  NOT NULL,
-    introduce        TEXT                          NULL,
-    email            VARCHAR(50)                   NULL,
-    phone            VARCHAR(20)                   NULL,
-    province         VARCHAR(255)                  NULL,
-    address          VARCHAR(255)                  NULL,
-    field            VARCHAR(255)                  NULL,
-    logo             VARCHAR(255)                  NULL,
-    scale            SMALLINT                      NULL,
-    corporateTaxCode VARCHAR(100)                  NOT NULL UNIQUE,
-    website          VARCHAR(255)                  NULL,
-    status           VARCHAR(10) DEFAULT 'ACTIVE'  NOT NULL, -- Thay thế ENUM bằng VARCHAR
-    createdAt        DATETIME    DEFAULT GETDATE() NOT NULL,
-    updatedAt        DATETIME    DEFAULT GETDATE() NOT NULL,
-    createdBy        VARCHAR(36) DEFAULT 'system'  NOT NULL,
-    updatedBy        VARCHAR(36) DEFAULT 'system'  NOT NULL
-);
-
-CREATE TABLE [user]
-( -- "user" là từ khóa trong SQL Server, nên cần đặt trong dấu ngoặc []
-    userID VARCHAR
-(
-    36
-) NOT NULL PRIMARY KEY,
-    companyID VARCHAR
-(
-    36
-) NULL,
-    username VARCHAR
-(
-    255
-) NULL,
-    email VARCHAR
-(
-    50
-) NOT NULL UNIQUE,
-    password VARCHAR
-(
-    100
-) NOT NULL,
-    phone VARCHAR
-(
-    20
-) NULL,
-    avatar VARCHAR
-(
-    255
-) NULL,
-    profile VARCHAR
-(
-    255
-) NOT NULL,
-    status VARCHAR
-(
-    10
-) DEFAULT 'ACTIVE' NOT NULL, -- Thay thế ENUM bằng VARCHAR
-    language VARCHAR
-(
-    50
-) NULL,
-    certificate VARCHAR
-(
-    100
-) NULL,
-    education VARCHAR
-(
-    255
-) NULL,
-    createdAt DATETIME DEFAULT GETDATE
-(
-) NOT NULL,
-    updatedAt DATETIME DEFAULT GETDATE
-(
-) NOT NULL,
-    createdBy VARCHAR
-(
-    36
-) DEFAULT 'system' NOT NULL,
-    updatedBy VARCHAR
-(
-    36
-) DEFAULT 'system' NOT NULL,
-    FOREIGN KEY
-(
-    companyID
-) REFERENCES company
-(
-    companyID
-)
-    );
-
-CREATE TABLE user_role
-(
-    roleID    VARCHAR(36)                   NOT NULL,
-    userID    VARCHAR(36)                   NOT NULL,
-    createdAt DATETIME    DEFAULT GETDATE() NOT NULL,
-    updatedAt DATETIME    DEFAULT GETDATE() NOT NULL,
-    createdBy VARCHAR(36) DEFAULT 'system'  NOT NULL,
-    updatedBy VARCHAR(36) DEFAULT 'system'  NOT NULL,
-    FOREIGN KEY (roleID) REFERENCES role (roleID),
-    FOREIGN KEY (userID) REFERENCES [user] (userID)
-);
-
-CREATE TABLE verify_code
-(
-    verifyCodeID VARCHAR(36)                   NOT NULL PRIMARY KEY,
-    code         VARCHAR(36)                   NOT NULL,
-    email        VARCHAR(50)                   NOT NULL UNIQUE,
-    status       VARCHAR(10) DEFAULT 'ACTIVE'  NOT NULL, -- Thay thế ENUM bằng VARCHAR
-    createdAt    DATETIME    DEFAULT GETDATE() NOT NULL,
-    updatedAt    DATETIME    DEFAULT GETDATE() NOT NULL,
-    createdBy    VARCHAR(36) DEFAULT 'system'  NOT NULL,
-    updatedBy    VARCHAR(36) DEFAULT 'system'  NOT NULL
-);
-
-CREATE TABLE [file]
-(
-    fileID VARCHAR
-(
-    36
-) NOT NULL PRIMARY KEY,
-    userID VARCHAR
-(
-    36
-) NULL,
-    companyID VARCHAR
-(
-    36
-) NULL,
-    fileName VARCHAR
-(
-    255
-) NOT NULL,
-    fileType VARCHAR
-(
-    255
-) NOT NULL,
-    filePath VARCHAR
-(
-    255
-) NOT NULL UNIQUE,
-    status VARCHAR
-(
-    10
-) DEFAULT 'ACTIVE' NOT NULL, -- Thay thế ENUM bằng VARCHAR
-    createdAt DATETIME DEFAULT GETDATE
-(
-) NOT NULL,
-    updatedAt DATETIME DEFAULT GETDATE
-(
-) NOT NULL,
-    createdBy VARCHAR
-(
-    36
-) DEFAULT 'system' NOT NULL,
-    updatedBy VARCHAR
-(
-    36
-) DEFAULT 'system' NOT NULL
-    );
-
-CREATE TABLE blog
-(
-    blogID    VARCHAR(36)                   NOT NULL PRIMARY KEY,
-    userID    VARCHAR(36)                   NOT NULL,
-    status    VARCHAR(10) DEFAULT 'PENDING' NOT NULL, -- Thay thế ENUM bằng VARCHAR
-    title     VARCHAR(255)                  NOT NULL,
-    keyword   VARCHAR(255)                  NOT NULL,
-    content   TEXT                          NOT NULL, -- Sử dụng TEXT thay vì LONGTEXT
-    viewCount INT         DEFAULT 0         NOT NULL,
-    image     VARCHAR(255)                  NOT NULL,
-    createdAt DATETIME    DEFAULT GETDATE() NOT NULL,
-    updatedAt DATETIME    DEFAULT GETDATE() NOT NULL,
-    createdBy VARCHAR(36) DEFAULT 'system'  NOT NULL,
-    updatedBy VARCHAR(36) DEFAULT 'system'  NOT NULL,
-    FOREIGN KEY (userID) REFERENCES user (userID)
-);
-
-CREATE TABLE service_pack
-(
-    servicePackID   VARCHAR(36)                   NOT NULL PRIMARY KEY,
-    servicePackName VARCHAR(255)                  NOT NULL,
-    price           DECIMAL(10, 2)                NOT NULL,
-    promotion       DECIMAL(10, 2)                NOT NULL,
-    content         TEXT                          NOT NULL, -- Sử dụng TEXT thay vì LONGTEXT
-    expirationDate  DECIMAL(10, 2)                NOT NULL,
-    image           VARCHAR(255)                  NOT NULL,
-    createdAt       DATETIME    DEFAULT GETDATE() NOT NULL,
-    updatedAt       DATETIME    DEFAULT GETDATE() NOT NULL,
-    createdBy       VARCHAR(36) DEFAULT 'system'  NOT NULL,
-    updatedBy       VARCHAR(36) DEFAULT 'system'  NOT NULL
-);
-
-CREATE TABLE product
-(
-    productID       VARCHAR(36)                   NOT NULL PRIMARY KEY,
-    servicePackID   VARCHAR(36)                   NOT NULL,
-    userID          VARCHAR(36)                   NOT NULL,
-    status          VARCHAR(10) DEFAULT 'DRAFT'   NOT NULL, -- Thay thế ENUM bằng VARCHAR
-    totalExpiration DECIMAL(10, 2)                NOT NULL DEFAULT 0,
-    createdAt       DATETIME    DEFAULT GETDATE() NOT NULL,
-    updatedAt       DATETIME    DEFAULT GETDATE() NOT NULL,
-    createdBy       VARCHAR(36) DEFAULT 'system'  NOT NULL,
-    updatedBy       VARCHAR(36) DEFAULT 'system'  NOT NULL,
-    FOREIGN KEY (userID) REFERENCES [user] (userID),
-    FOREIGN KEY (servicePackID) REFERENCES service_pack (servicePackID)
-);
-
-CREATE TABLE history
-(
-    historyID VARCHAR(36)                   NOT NULL PRIMARY KEY,
-    productID VARCHAR(36)                   NOT NULL,
-    status    VARCHAR(10) DEFAULT 'PAID'    NOT NULL, -- Thay thế ENUM bằng VARCHAR
-    createdAt DATETIME    DEFAULT GETDATE() NOT NULL,
-    updatedAt DATETIME    DEFAULT GETDATE() NOT NULL,
-    createdBy VARCHAR(36) DEFAULT 'system'  NOT NULL,
-    updatedBy VARCHAR(36) DEFAULT 'system'  NOT NULL,
-    FOREIGN KEY (productID) REFERENCES product (productID)
-);
-
-CREATE TABLE recruitment
-(
-    recruitmentID  VARCHAR(36)                   NOT NULL PRIMARY KEY,
-    userID         VARCHAR(36)                   NOT NULL,
-    status         VARCHAR(10) DEFAULT 'PENDING' NOT NULL, -- Thay thế ENUM bằng VARCHAR
-    title          VARCHAR(255)                  NOT NULL,
-    keyword        VARCHAR(255)                  NOT NULL,
-    address        VARCHAR(255)                  NOT NULL,
-    description    TEXT                          NOT NULL, -- Sử dụng TEXT thay vì LONGTEXT
-    required       TEXT                          NOT NULL, -- Sử dụng TEXT thay vì LONGTEXT
-    province       VARCHAR(255)                  NULL,
-    field          VARCHAR(255)                  NULL,
-    timeExpiration DECIMAL(10, 2)                NOT NULL DEFAULT 0,
-    salaryFrom     DECIMAL(10, 2)                NOT NULL DEFAULT 0,
-    salaryTo       DECIMAL(10, 2)                NOT NULL DEFAULT 0,
-    createdAt      DATETIME    DEFAULT GETDATE() NOT NULL,
-    updatedAt      DATETIME    DEFAULT GETDATE() NOT NULL,
-    createdBy      VARCHAR(36) DEFAULT 'system'  NOT NULL,
-    updatedBy      VARCHAR(36) DEFAULT 'system'  NOT NULL,
-    FOREIGN KEY (userID) REFERENCES [user] (userID)
-);
-
-CREATE TABLE recruitment_process
-(
-    recruitmentProcessID VARCHAR(36)                   NOT NULL PRIMARY KEY,
-    userID               VARCHAR(36)                   NOT NULL,
-    candidateID          VARCHAR(36)                   NOT NULL,
-    status               VARCHAR(10) DEFAULT 'REVIEW'  NOT NULL, -- Thay thế ENUM bằng VARCHAR
-    createdAt            DATETIME    DEFAULT GETDATE() NOT NULL,
-    updatedAt            DATETIME    DEFAULT GETDATE() NOT NULL,
-    createdBy            VARCHAR(36) DEFAULT 'system'  NOT NULL,
-    updatedBy            VARCHAR(36) DEFAULT 'system'  NOT NULL,
-    FOREIGN KEY (userID) REFERENCES [user] (userID)
-);
