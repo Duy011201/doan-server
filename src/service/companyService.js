@@ -277,7 +277,7 @@ const companyService = {
         const payload = req.body;
         const schema = Joi.object({
             companyID: Joi.string().required(),
-            token: Joi.string().required(),
+            token: Joi.string().allow(''),
         });
 
         const {error} = schema.validate(payload);
@@ -374,6 +374,76 @@ const companyService = {
             });
         } catch (err) {
             console.error('Error executing query get all header company :', err.stack);
+            return res
+                .status(constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR)
+                .json({
+                    status: constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                    message: constant.SYSTEM_HTTP_MESSAGE.INTERNAL_SERVER_ERROR,
+                });
+        }
+    },
+    svFollow: async (req, res) => {
+        const followCompanyID = uuidv4();
+        const payload = req.body;
+        const schema = Joi.object({
+            userID: Joi.string().required(),
+            companyID: Joi.string().required(),
+            token: Joi.string().required(),
+        });
+
+        const {error} = schema.validate(payload);
+        if (error) {
+            return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST).json({
+                status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
+                massage: error.details[0].message,
+            });
+        }
+
+        try {
+            const flowCompanyDB = await querySQl(
+                `SELECT *
+                 FROM ${constant.TABLE_DATABASE.FOLLOW_COMPANY} as f
+                 WHERE f.userID = ? AND f.companyID = ?`,
+                [payload.userID, payload.companyID]
+            );
+
+            console.log(flowCompanyDB)
+
+            if (isEmpty(flowCompanyDB)) {
+
+                await querySQl(
+                    `INSERT INTO ${constant.TABLE_DATABASE.FOLLOW_COMPANY} (followCompanyID, userID, companyID, createdBy)
+                 VALUES (?, ?, ?, ?)`,
+                    [
+                        followCompanyID,
+                        payload.userID,
+                        payload.companyID,
+                        payload.userID,
+                    ]
+                );
+
+                return res.status(constant.SYSTEM_HTTP_STATUS.OK).json({
+                    status: constant.SYSTEM_HTTP_STATUS.OK,
+                    message: constant.RESPONSE_MESSAGE.SUCCESS_FOLLOW,
+                });
+            } else {
+                await querySQl(
+                    `DELETE
+                     FROM ${constant.TABLE_DATABASE.FOLLOW_COMPANY} as f
+                     WHERE f.followCompanyID = ?`,
+                    [flowCompanyDB[0].followCompanyID]
+                );
+
+                return res.status(constant.SYSTEM_HTTP_STATUS.OK).json({
+                    status: constant.SYSTEM_HTTP_STATUS.OK,
+                    message: constant.RESPONSE_MESSAGE.SUCCESS_LEAVE_FOLLOW,
+                });
+            }
+        } catch (err) {
+            console.error(
+                'Error executing query follow company by id :',
+                err.stack
+            );
             return res
                 .status(constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR)
                 .json({

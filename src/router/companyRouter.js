@@ -8,6 +8,7 @@ router.post('/delete', companyController.delete);
 router.post('/get-all', companyController.getAll);
 router.post('/get-by-id', companyController.getByID);
 router.post('/get-all-header', companyController.getAllHeader);
+router.post('/follow', companyController.follow);
 router.post('/lock', companyController.lock);
 
 module.exports = router;

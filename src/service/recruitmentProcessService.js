@@ -51,7 +51,7 @@ const recruitmentProcessService = {
 
             return res.status(constant.SYSTEM_HTTP_STATUS.OK).json({
                 status: constant.SYSTEM_HTTP_STATUS.OK,
-                message: constant.RESPONSE_MESSAGE.SUCCESS_CREATE,
+                message: constant.RESPONSE_MESSAGE.SUCCESS_CANDIDATE,
                 data: {recruitmentProcessID: recruitmentProcessID},
             });
         } catch (err) {

@@ -112,7 +112,7 @@ create table service_pack
 (
     servicePackID   varchar(36)                           not null primary key,
     servicePackName varchar(255)                          not null,
-    price           INT                               NOT NULL,
+    price           INT                                   NOT NULL,
     promotion       TINYINT                               NOT NULL,
     content         longtext                              not null,
     expirationDate  TINYINT                               not null,
@@ -165,8 +165,8 @@ create table recruitment
     timeForm      varchar(255)                                                        null,
     timeStart     timestamp                                 default CURRENT_TIMESTAMP not null,
     timeEnd       timestamp                                 default CURRENT_TIMESTAMP not null,
-    salaryFrom    INT                                                             not null default 0,
-    salaryTo      INT                                                             not null default 0,
+    salaryFrom    INT                                                                 not null default 0,
+    salaryTo      INT                                                                 not null default 0,
     createdAt     timestamp                                 default CURRENT_TIMESTAMP not null,
     updatedAt     timestamp                                 default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
     createdBy     varchar(36)                               default 'system'          not null,
@@ -234,3 +234,12 @@ VALUES ('b4f1d09e-34aa-4e38-b24f-9f1c3b7a6d8e',
 
 
 #MSSQL
+
+SELECT r.*
+FROM recruitment AS r
+         LEFT JOIN user AS u
+                   ON u.userID = r.createdBy
+         LEFT JOIN company AS c
+                   ON c.userID = u.userID
+WHERE r.status = 'PUBLISHED'
+ORDER BY r.updatedAt DESC
