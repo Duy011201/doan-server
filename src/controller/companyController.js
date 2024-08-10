@@ -16,6 +16,9 @@ const companyController = {
   getAllHeader: (req, res) => {
     return companyService.svGetAllHeader(req, res);
   },
+  follow: (req, res) => {
+    return companyService.svFollow(req, res);
+  },
   delete: (req, res) => {
     return companyService.svDelete(req, res);
   },
