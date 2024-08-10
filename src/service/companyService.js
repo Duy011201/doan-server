@@ -309,23 +309,68 @@ const companyService = {
         }
     },
     svGetAllHeader: async (req, res) => {
+        const payload = req.body;
+        const schema = Joi.object({
+            companyName: Joi.string().allow(''),
+            province: Joi.string().allow(''),
+            field: Joi.string().allow(''),
+        });
+
+        const { error } = schema.validate(payload);
+        if (error) {
+            return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST).json({
+                status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
+                massage: error.details[0].message,
+            });
+        }
+
         try {
-            let companyDB = await querySQl(`SELECT c.companyID,
-                                                   c.name                 as companyName,
-                                                   c.logo                 as companyLogo,
-                                                   COUNT(r.recruitmentID) AS recruitmentCount
-                                            FROM ${constant.TABLE_DATABASE.COMPANY} AS c
-                                                     LEFT JOIN ${constant.TABLE_DATABASE.USER} AS u
-                                                               ON u.companyID = c.companyID
-                                                     LEFT JOIN ${constant.TABLE_DATABASE.RECRUITMENT} AS r
-                                                               ON r.userID = u.userID
-                                            WHERE c.status = '${constant.SYSTEM_STATUS.ACTIVE}'
-                                              AND r.status = '${constant.RECRUITMENT.PUBLISHED}'
-                                            GROUP BY c.companyID, c.name, c.logo
-                                            ORDER BY c.logo DESC`);
+            let sql = `SELECT c.companyID,
+                              c.name                 as companyName,
+                              c.logo                 as companyLogo,
+                              c.address              as companyAddress,
+                              r.userID,
+                              COUNT(r.recruitmentID) AS recruitmentCount
+                       FROM ${constant.TABLE_DATABASE.COMPANY} AS c
+                                LEFT JOIN ${constant.TABLE_DATABASE.USER} AS u
+                                          ON u.companyID = c.companyID
+                                LEFT JOIN ${constant.TABLE_DATABASE.RECRUITMENT} AS r
+                                          ON r.userID = u.userID`;
+
+            let conditions = [];
+            let params = [];
+
+            if (payload && typeof payload === 'object') {
+                conditions.push('c.status = ?');
+                params.push(constant.SYSTEM_STATUS.ACTIVE);
+
+                conditions.push('r.status = ?');
+                params.push(constant.RECRUITMENT.PUBLISHED);
+
+                if (!isEmpty(payload.companyName)) {
+                    conditions.push('c.name LIKE ?');
+                    params.push(`%${payload.companyName}%`);
+                }
+
+                if (!isEmpty(payload.province)) {
+                    conditions.push('c.province = ?');
+                    params.push(payload.province);
+                }
+
+                if (!isEmpty(payload.field)) {
+                    conditions.push('c.field = ?');
+                    params.push(payload.field);
+                }
+            }
+
+            if (conditions.length > 0) {
+                sql += ' WHERE ' + conditions.join(' AND ');
+            }
+            sql += ' GROUP BY c.companyID, c.name, c.logo, r.userID ORDER BY c.logo DESC';
+
             return res.status(constant.SYSTEM_HTTP_STATUS.OK).json({
                 status: constant.SYSTEM_HTTP_STATUS.OK,
-                data: companyDB,
+                data: await querySQl(sql, params),
             });
         } catch (err) {
             console.error('Error executing query get all header company :', err.stack);
@@ -336,7 +381,7 @@ const companyService = {
                     message: constant.SYSTEM_HTTP_MESSAGE.INTERNAL_SERVER_ERROR,
                 });
         }
-    }
+    },
 };
 
 module.exports = companyService;
