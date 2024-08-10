@@ -262,6 +262,7 @@ const blogService = {
         userID: Joi.string().allow(''),
         status: Joi.string().allow(''),
         keyword: Joi.string().allow(''),
+        token: Joi.string().allow('')
       });
 
       const { error } = schema.validate(payload);

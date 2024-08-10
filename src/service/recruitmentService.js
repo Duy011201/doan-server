@@ -271,7 +271,7 @@ const recruitmentService = {
       const schema = Joi.object({
         userID: Joi.string().allow(''),
         status: Joi.string().allow(''),
-        token: Joi.string().required(),
+        token: Joi.string().allow(''),
       });
 
       const { error } = schema.validate(payload);
