@@ -326,9 +326,11 @@ const recruitmentService = {
         try {
             const payload = req.body;
             const schema = Joi.object({
-                companyID: Joi.string().required(),
+                companyID: Joi.string().allow(''),
+                recruitmentID: Joi.string().allow(''),
                 province: Joi.string().allow(''),
                 keyword: Joi.string().allow(''),
+                field: Joi.string().allow(''),
                 status: Joi.string().allow(''),
                 token: Joi.string().allow(''),
             });
@@ -340,7 +342,8 @@ const recruitmentService = {
                     massage: error.details[0].message,
                 });
             }
-            let sql = `SELECT r.*, c.companyID, c.name as companyName
+            let sql = `SELECT r.*, c.companyID, c.name as companyName, c.logo as companyLogo, c.scale as companyScale,
+                            c.field as companyField, c.address as companyAddress
                        FROM ${constant.TABLE_DATABASE.RECRUITMENT} AS r
                                 LEFT JOIN ${constant.TABLE_DATABASE.USER} AS u
                                           ON u.userID = r.userID
@@ -365,9 +368,19 @@ const recruitmentService = {
                 params.push(payload.province);
             }
 
+            if (!isEmpty(payload.field)) {
+                conditions.push('r.field = ?');
+                params.push(payload.field);
+            }
+
+            if (!isEmpty(payload.recruitmentID)) {
+                conditions.push('r.recruitmentID = ?');
+                params.push(payload.recruitmentID);
+            }
+
             if (!isEmpty(payload.keyword)) {
-                conditions.push('r.keyword = ?');
-                params.push(payload.keyword);
+                conditions.push('r.keyword LIKE ?');
+                params.push(`%${payload.keyword}%`);
             }
 
             if (conditions.length > 0) {
