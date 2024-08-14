@@ -190,7 +190,7 @@ const authService = {
                 [payload.email]
             );
 
-            if (isEmpty(user2DB)) {
+            if (!isEmpty(user2DB)) {
                 return res.status(constant.SYSTEM_HTTP_STATUS.BAD_REQUEST).json({
                     status: constant.SYSTEM_HTTP_STATUS.BAD_REQUEST,
                     message: constant.RESPONSE_MESSAGE.ERROR_EMAIL_ALREADY_EXIT,
