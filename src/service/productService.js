@@ -177,6 +177,8 @@ const productService = {
           );
         }
       } else {
+        console.log('aaaaaaaaaa')
+
         await querySQl(
           `UPDATE ${constant.TABLE_DATABASE.PRODUCT}
                                 SET status = ?,

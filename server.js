@@ -21,6 +21,7 @@ const routerHistory = require('./src/router/historyRouter');
 const routerRecruitment = require('./src/router/recruitmentRouter');
 const routerRecruitmentProcess = require('./src/router/recruitmentProcessRouter');
 const routerFollowCompany = require('./src/router/followCompanyRouter');
+const routerReport = require('./src/router/reportRouter');
 
 require('dotenv').config();
 
@@ -64,6 +65,7 @@ app.use('/api/history', routerHistory);
 app.use('/api/recruitment', routerRecruitment);
 app.use('/api/recruitment-process', routerRecruitmentProcess);
 app.use('/api/follow-company', routerFollowCompany);
+app.use('/api/report', routerReport);
 
 app.listen(port, () => {
   console.log(`Server is listening on port ${port}`);
