@@ -387,7 +387,7 @@ const recruitmentService = {
                 sql += ' WHERE ' + conditions.join(' AND ');
             }
 
-            sql += ' ORDER BY r.updatedAt DESC';
+            sql += ' AND r.timeEnd >= NOW() ORDER BY r.updatedAt DESC';
 
             let recruitmentDB = await querySQl(sql, params);
             return res.status(constant.SYSTEM_HTTP_STATUS.OK).json({
