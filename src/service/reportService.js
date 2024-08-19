@@ -53,11 +53,12 @@ const reportService = {
                 });
         }
     },
-    svGetByID: async (req, res) => {
+    svAdmin: async (req, res) => {
         try {
             const payload = req.body;
             const schema = Joi.object({
-                blogID: Joi.string().required(),
+                keyword: Joi.string().allow(''),
+                token: Joi.string().allow('')
             });
 
             const {error} = schema.validate(payload);
@@ -67,15 +68,28 @@ const reportService = {
                     massage: error.details[0].message,
                 });
             }
-            let sql = `SELECT *
-                       FROM ${constant.TABLE_DATABASE.BLOG} AS b
-                       WHERE b.blogID = '${payload.blogID}'`;
+
+            let sql = '';
+            if (payload.keyword === 'service_pack') {
+                sql = `SELECT p.productID, p.servicePackID, p.updatedAt, p.count, s.price, s.promotion
+                       FROM ${constant.TABLE_DATABASE.PRODUCT} AS p
+                                LEFT JOIN ${constant.TABLE_DATABASE.SERVICE_PACK} AS s
+                                          ON s.servicePackID = p.servicePackID`;
+            } else if (payload.keyword === 'recruitment') {
+                sql = `SELECT r.recruitmentID, COUNT(DISTINCT r.recruitmentID) as recruitmentCount, r.updatedAt,
+                            COUNT(rp.recruitmentProcessID) AS recruitmentProcessCount
+                       FROM ${constant.TABLE_DATABASE.RECRUITMENT} AS r
+                                LEFT JOIN ${constant.TABLE_DATABASE.RECRUITMENT_PROCESS} AS rp
+                                          ON rp.recruitmentID = r.recruitmentID
+                                GROUP BY r.recruitmentID, r.updatedAt`;
+            }
+
             return res.status(constant.SYSTEM_HTTP_STATUS.OK).json({
                 status: constant.SYSTEM_HTTP_STATUS.OK,
-                data: await querySQl(sql),
+                data: await querySQl(sql, ),
             });
         } catch (err) {
-            console.error('Error executing query get by id blog :', err.stack);
+            console.error(`Error executing query get report :`, err.stack);
             return res
                 .status(constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR)
                 .json({
@@ -83,7 +97,7 @@ const reportService = {
                     message: constant.SYSTEM_HTTP_MESSAGE.INTERNAL_SERVER_ERROR,
                 });
         }
-    },
+    }
 };
 
 module.exports = reportService;

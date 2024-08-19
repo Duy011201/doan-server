@@ -128,6 +128,7 @@ create table product
     productID       varchar(36)                                                 not null primary key,
     servicePackID   varchar(36)                                                 not null,
     userID          varchar(36)                                                 not null,
+    count           int                                                         not null default 0,
     status          enum ('DRAFT', 'PENDING', 'PAID') default 'DRAFT'           not null,
     totalExpiration TINYINT                                                     not null default 0,
     createdAt       timestamp                         default CURRENT_TIMESTAMP not null,

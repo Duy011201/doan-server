@@ -143,12 +143,14 @@ const productService = {
             `UPDATE ${constant.TABLE_DATABASE.PRODUCT}
                                   SET status = ?,
                                       totalExpiration = ?,
+                                      count = ?,
                                       updatedBy = ?
                                   WHERE productID = ?`,
             [
               payload.status,
               Number(productDB[0].totalExpiration) +
                 Number(servicePackDB[0].expirationDate),
+              productDB[0].count += 1,
               payload.updatedBy,
               productDB[0].productID,
             ]
@@ -158,6 +160,7 @@ const productService = {
             `UPDATE ${constant.TABLE_DATABASE.PRODUCT}
                                 SET status = ?,
                                     totalExpiration = ?,
+                                    count = ?,
                                     updatedBy = ?
                                 WHERE productID = ?`,
             [
@@ -165,6 +168,7 @@ const productService = {
               Number(productDB[0].totalExpiration) +
                 Number(servicePackDB[0].expirationDate) +
                 Number(servicePackInProductDB[0].totalExpiration),
+              productDB[0].count += 1,
               payload.updatedBy,
               productDB[0].productID,
             ]
@@ -177,8 +181,6 @@ const productService = {
           );
         }
       } else {
-        console.log('aaaaaaaaaa')
-
         await querySQl(
           `UPDATE ${constant.TABLE_DATABASE.PRODUCT}
                                 SET status = ?,
