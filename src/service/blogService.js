@@ -41,14 +41,15 @@ const blogService = {
 
       await querySQl(
         `INSERT INTO ${constant.TABLE_DATABASE.BLOG} (blogID, title, keyword, content,
-                                                                        image ,createdBy)
-                            VALUES (?, ?, ?, ?, ?, ?)`,
+                                                                        image ,createdBy, userID)
+                            VALUES (?, ?, ?, ?, ?, ?, ?)`,
         [
           blogID,
           payload.title,
           payload.keyword,
           payload.content,
           payload.image,
+          payload.createdBy,
           payload.createdBy,
         ]
       );

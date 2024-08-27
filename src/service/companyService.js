@@ -344,9 +344,6 @@ const companyService = {
                 conditions.push('c.status = ?');
                 params.push(constant.SYSTEM_STATUS.ACTIVE);
 
-                conditions.push('r.status = ?');
-                params.push(constant.RECRUITMENT.PUBLISHED);
-
                 if (!isEmpty(payload.companyName)) {
                     conditions.push('c.name LIKE ?');
                     params.push(`%${payload.companyName}%`);

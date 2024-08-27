@@ -96,7 +96,7 @@ const authService = {
                                                                   phone, avatar, status, language,
                                                                   certificate, profile,
                                                                   education, createdBy)
-                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
                     [
                         userID,
                         payload.username,
@@ -186,8 +186,8 @@ const authService = {
             let user2DB = await querySQl(
                 `SELECT *
                  FROM ${constant.TABLE_DATABASE.USER} as u
-                 WHERE u.email = ?`,
-                [payload.email]
+                 WHERE u.email = ? AND u.userID <> ?`,
+                [payload.email, payload.userID]
             );
 
             if (!isEmpty(user2DB)) {
