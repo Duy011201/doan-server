@@ -330,7 +330,7 @@ const companyService = {
                               c.logo                 as companyLogo,
                               c.address              as companyAddress,
                               r.userID,
-                              COUNT(r.recruitmentID) AS recruitmentCount
+                              SUM(CASE WHEN r.status = 'PUBLISHED' THEN 1 ELSE 0 END) AS recruitmentCount
                        FROM ${constant.TABLE_DATABASE.COMPANY} AS c
                                 LEFT JOIN ${constant.TABLE_DATABASE.USER} AS u
                                           ON u.companyID = c.companyID
