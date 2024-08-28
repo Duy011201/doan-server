@@ -1,0 +1,54 @@
+-- MySQL dump 10.13  Distrib 8.0.38, for Win64 (x86_64)
+--
+-- Host: localhost    Database: doan
+-- ------------------------------------------------------
+-- Server version	8.0.39
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `user_role`
+--
+
+DROP TABLE IF EXISTS `user_role`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `user_role` (
+  `roleID` varchar(36) NOT NULL,
+  `userID` varchar(36) NOT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `createdBy` varchar(36) NOT NULL DEFAULT 'system',
+  `updatedBy` varchar(36) NOT NULL DEFAULT 'system'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `user_role`
+--
+
+LOCK TABLES `user_role` WRITE;
+/*!40000 ALTER TABLE `user_role` DISABLE KEYS */;
+INSERT INTO `user_role` VALUES ('7d2e5a1f-46b1-4d9b-b7c3-5e9a7d4f8e2f','06f68302-ac93-4c17-91d9-b277599bc120','2024-08-17 00:33:41','2024-08-28 02:51:20','system','06f68302-ac93-4c17-91d9-b277599bc120'),('7d2e5a1f-46b1-4d9b-b7c3-5e9a7d4f8e2f','1308c158-e955-4558-a6e8-6c9e64551e37','2024-08-17 00:34:22','2024-08-27 10:18:07','system','74c9ed65-76c1-4945-a024-1ac5a937caac'),('7d2e5a1f-46b1-4d9b-b7c3-5e9a7d4f8e2f','63d153d8-f1cc-4967-b8e6-a35ced2a8752','2024-08-17 00:34:56','2024-08-27 10:17:35','system','74c9ed65-76c1-4945-a024-1ac5a937caac'),('e8b3d2f7-8a6b-4e5f-9c1d-7f8e9a1d3c2b','a1d85342-7484-4c7b-9774-aeea64296576','2024-08-17 00:37:00','2024-08-27 10:16:56','system','74c9ed65-76c1-4945-a024-1ac5a937caac'),('7d2e5a1f-46b1-4d9b-b7c3-5e9a7d4f8e2f','01744243-02a3-4892-bee8-5c2bb125a886','2024-08-17 00:38:31','2024-08-17 00:38:31','system','system'),('e8b3d2f7-8a6b-4e5f-9c1d-7f8e9a1d3c2b','74c9ed65-76c1-4945-a024-1ac5a937caac','2024-08-17 00:46:27','2024-08-28 02:25:09','system','ea1e875b-104b-49a5-a2e2-061a540eca3a'),('e8b3d2f7-8a6b-4e5f-9c1d-7f8e9a1d3c2b','3b1d1224-1d7a-43e5-ba3e-87e963c0e1d7','2024-08-27 10:26:23','2024-08-28 02:02:12','74c9ed65-76c1-4945-a024-1ac5a937caac','ea1e875b-104b-49a5-a2e2-061a540eca3a'),('b4f1d09e-34aa-4e38-b24f-9f1c3b7a6d8e','ea1e875b-104b-49a5-a2e2-061a540eca3a','2024-08-27 14:12:57','2024-08-27 14:12:57','74c9ed65-76c1-4945-a024-1ac5a937caac','system');
+/*!40000 ALTER TABLE `user_role` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2024-08-28  9:59:57
