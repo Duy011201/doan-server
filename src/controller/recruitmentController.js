@@ -16,6 +16,12 @@ const recruitmentController = {
   getAllHeader: (req, res) => {
     return recruitmentService.svGetAllHeader(req, res);
   },
+  getAllHome: (req, res) => {
+    return recruitmentService.svGetAllHome(req, res);
+  },
+  getAllCountRecruitment: (req, res) => {
+    return recruitmentService.svGetAllCountRecruitment(req, res);
+  },
   delete: (req, res) => {
     return recruitmentService.svDelete(req, res);
   },

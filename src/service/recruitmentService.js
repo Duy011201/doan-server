@@ -404,6 +404,47 @@ const recruitmentService = {
                 });
         }
     },
+
+    svGetAllHome: async (req, res) => {
+        try {
+            let result =
+                await querySQl(`SELECT r.field, COUNT(*) AS count FROM ${constant.TABLE_DATABASE.RECRUITMENT} AS r
+                                                  GROUP BY r.field ORDER BY count DESC LIMIT 6`);
+            return res.status(constant.SYSTEM_HTTP_STATUS.OK).json({
+                status: constant.SYSTEM_HTTP_STATUS.OK,
+                data: result,
+            });
+        } catch (err) {
+            console.error('Error executing query get all home recruitment :', err.stack);
+            return res
+                .status(constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR)
+                .json({
+                    status: constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                    message: constant.SYSTEM_HTTP_MESSAGE.INTERNAL_SERVER_ERROR,
+                });
+        }
+    },
+
+    svGetAllCountRecruitment: async (req, res) => {
+        try {
+            let result =
+                await querySQl(`SELECT COUNT(*) AS countIn24h, (SELECT COUNT(*) FROM ${constant.TABLE_DATABASE.RECRUITMENT}) AS countAll
+                                                  FROM ${constant.TABLE_DATABASE.RECRUITMENT} AS r
+                                                  WHERE DATE(r.updatedAt) = CURDATE()`);
+            return res.status(constant.SYSTEM_HTTP_STATUS.OK).json({
+                status: constant.SYSTEM_HTTP_STATUS.OK,
+                data: result,
+            });
+        } catch (err) {
+            console.error('Error executing query get all home count recruitment :', err.stack);
+            return res
+                .status(constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR)
+                .json({
+                    status: constant.SYSTEM_HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                    message: constant.SYSTEM_HTTP_MESSAGE.INTERNAL_SERVER_ERROR,
+                });
+        }
+    },
 };
 
 module.exports = recruitmentService;

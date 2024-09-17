@@ -90,6 +90,7 @@ const constant = {
     SUCCESS_CANDIDATE: 'Ứng tuyển thành công',
     SUCCESS_DELETE: 'Xóa thành công',
     SUCCESS_LOCK: 'Khóa thành công',
+    SUCCESS_OPEN: 'Mở khóa thành công',
     SUCCESS_RESET_PASSWORD: 'Đặt lại mật khẩu thành công',
     SUCCESS_UPDATE: 'Cập nhật thành công',
     SUCCESS_SEND_EMAIL: 'Gửi email thành công',

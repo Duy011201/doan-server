@@ -305,6 +305,7 @@ const authService = {
         const payload = req.body;
         const schema = Joi.object({
             userID: Joi.string().required(),
+            status: Joi.string().required(),
             token: Joi.string().required(),
         });
 
@@ -321,12 +322,14 @@ const authService = {
                 `UPDATE ${constant.TABLE_DATABASE.USER} as u
                  SET u.status = ?
                  WHERE u.userID = ?`,
-                [constant.SYSTEM_STATUS.LOCK, payload.userID]
+                [payload.status, payload.userID]
             );
 
             return res.status(constant.SYSTEM_HTTP_STATUS.OK).json({
                 status: constant.SYSTEM_HTTP_STATUS.OK,
-                message: constant.RESPONSE_MESSAGE.SUCCESS_LOCK,
+                message: payload.status === 'LOCK'
+                    ? constant.RESPONSE_MESSAGE.SUCCESS_LOCK
+                    : constant.RESPONSE_MESSAGE.SUCCESS_OPEN,
             });
         } catch (err) {
             console.error('Error executing query lock user by id :', err.stack);
