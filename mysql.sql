@@ -95,7 +95,7 @@ create table blog
 (
     blogID    varchar(36)                                                         not null primary key,
     userID    varchar(36)                                                         not null,
-    status    enum ('PENDING', 'APPROVED', 'PUBLISHED') default 'PENDING'         not null,
+    status    enum ('PENDING', 'APPROVED', 'PUBLISHED', 'REJECT') default 'PENDING'         not null,
     title     varchar(255)                                                        not null,
     keyword   varchar(255)                                                        not null,
     content   longtext                                                            not null,
@@ -157,7 +157,7 @@ create table recruitment
 (
     recruitmentID varchar(36)                                                         not null primary key,
     userID        varchar(36)                                                         not null,
-    status        enum ('PENDING', 'APPROVED', 'PUBLISHED') default 'PENDING'         not null,
+    status        enum ('PENDING', 'APPROVED', 'PUBLISHED', 'REJECT') default 'PENDING'         not null,
     title         varchar(255)                                                        not null,
     keyword       varchar(255)                                                        not null,
     address       varchar(255)                                                        not null,
