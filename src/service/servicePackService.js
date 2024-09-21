@@ -11,10 +11,10 @@ const servicePackService = {
 
     const schema = Joi.object({
       servicePackName: Joi.string().required(),
-      price: Joi.number().required(),
+      price: Joi.number().required().min(0).max(100000000),
       content: Joi.string().required(),
-      promotion: Joi.number().required(),
-      expirationDate: Joi.number().required(),
+      promotion: Joi.number().required().min(0).max(100),
+      expirationDate: Joi.number().required().min(1).max(100),
       image: Joi.string().required(),
       createdBy: Joi.string().required(),
       token: Joi.string().required(),
@@ -75,10 +75,10 @@ const servicePackService = {
     const schema = Joi.object({
       servicePackID: Joi.string().required(),
       servicePackName: Joi.string().required(),
-      price: Joi.number().required(),
+      price: Joi.number().required().min(0).max(100000000),
       content: Joi.string().required(),
-      promotion: Joi.number().required(),
-      expirationDate: Joi.number().required(),
+      promotion: Joi.number().required().min(0).max(100),
+      expirationDate: Joi.number().required().min(1).max(100),
       image: Joi.string().required(),
       updatedBy: Joi.string().required(),
       token: Joi.string().required(),
